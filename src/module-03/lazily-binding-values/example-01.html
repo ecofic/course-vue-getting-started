@@ -13,14 +13,33 @@
             <div id="app">            
                 <form>
                     <p>
-                        An example of the <code>number</code> modifier. 
-                        The leading and trailing "|" is used to show that a trim is happening
+                        The following examples use the <code>lazy</code> modifier. 
+                        The leading and trailing "|" are used to show leading and trailingn whitespace.
                     </p>
+
                     <div class="form-group">
-                        <label for="resultInputField" class="form-label">What is two plus three?</label>
-                        <input v-model.number="result" placeholder="2+3=" id="resultInputField" class="form-control">                      
-                        <small class="text-muted">{{ result }}<br />{{ resultType }}</small>                            
+                        <label for="searchInputField1" class="form-label">search (by default binding <code>oninput</code>)</label>
+                        <input v-model="query1" placeholder="Search..." id="searchInputField1" type="search" class="form-control">                        
+                        <small class="text-muted"><b>|</b>{{ query1 }}<b>|</b></small>                            
                     </div>
+
+                    <div class="form-group">
+                        <label for="searchInputField2" class="form-label">search (by lazy binding)</label>
+                        <input v-model.lazy="query2" placeholder="Search..." id="searchInputField2" type="search" class="form-control">
+                        <small class="text-muted"><b>|</b>{{ query2 }}<b>|</b></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="searchInputField2" class="form-label">search (by lazy binding with trim)</label>
+                        <input v-model.lazy.trim="query3" placeholder="Search..." id="searchInputField2" type="search" class="form-control">
+                        <small class="text-muted"><b>|</b>{{ query3 }}<b>|</b></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="searchInputField4" class="form-label">search (by lazy binding as number)</label>
+                        <input v-model.lazy.number="query4" placeholder="Search..." id="searchInputField4" type="search" class="form-control">
+                        <small class="text-muted"><b>|</b>{{ query4 }}<b>|</b></small>
+                    </div>                    
                 </form>
             </div>
         </div>
@@ -49,17 +68,11 @@
             var app = new Vue({
                 el: '#app',
                 data: {
-                    result: null,
-                    resultType: ''
-                },
-
-                // watchers are a concept covered in module 6
-                watch: {
-                    result: function(val) {
-                        var t = typeof this.result;
-                        this.resultType = t;
-                    }
-                }                
+                    query1: '',
+                    query2: '',
+                    query3: '',
+                    query4: ''
+                }
             });        
         </script>
     </body>
