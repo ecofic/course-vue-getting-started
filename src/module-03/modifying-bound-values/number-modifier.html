@@ -10,26 +10,16 @@
     <body>
         <div class="container">
             <br />
-            <div id="growler">            
+            <div id="app">            
                 <form>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6 col-lg-4">
-                            <strong>Binding to Radio Buttons</strong>
-                            <div class="form-check row">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" value="beers" v-model="searchIndex">
-                                    Beers
-                                </label>
-                            </div>
-                            <div class="form-check row">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" value="breweries" v-model="searchIndex">
-                                    Breweries
-                                </label>
-                            </div>
-
-                            <small class="text-muted">selected: {{ searchIndex }}</small>
-                        </div>
+                    <p>
+                        An example of the <code>number</code> modifier. 
+                        The leading and trailing "|" is used to show that a trim is happening
+                    </p>
+                    <div class="form-group">
+                        <label for="resultInputField" class="form-label">What is two plus three?</label>
+                        <input v-model.number="result" placeholder="2+3=" id="resultInputField" class="form-control">                      
+                        <small class="text-muted">{{ result }}</small>                            
                     </div>
                 </form>
             </div>
@@ -56,10 +46,10 @@
 
         <script src="https://unpkg.com/vue@2.1.10/dist/vue.js" type="text/javascript"></script>
         <script type="text/javascript">
-            var growler = new Vue({
-                el: '#growler',
+            var app = new Vue({
+                el: '#app',
                 data: {
-                    searchIndex: 'beers'
+                    result: null
                 }
             });        
         </script>

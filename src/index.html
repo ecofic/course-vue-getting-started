@@ -59,11 +59,20 @@
 
                     <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
                         <div class="card-block">
+                            <strong>Using Input Bindings</strong>
                             <ul>
-                                <li><a href="/module-03/binding-to-checkboxes.html">Binding to Checkboxes</a></li>
-                                <li><a href="/module-03/binding-to-radio-buttons.html">Binding to Radio Buttons</a></li>                                
-                                <li><a href="/module-03/textual-input-types.html">Textual Input Types</a></li>
+                                <li><a href="/module-03/using-input-bindings/textual-input-types.html">Textual Input Types</a></li>                                
+                                <li><a href="/module-03/using-input-bindings/binding-to-checkboxes.html">Binding to Checkboxes</a></li>
+                                <li><a href="/module-03/using-input-bindings/binding-to-radio-buttons.html">Binding to Radio Buttons</a></li>
+                                <li><a href="/module-03/using-input-bindings/binding-to-drop-down-lists.html">Binding to Drop-Down Lists</a></li>
                             </ul>
+
+                            <strong>Modifying Bound Values</strong>
+                            <ul>
+                                <li><a href="/module-03/modifying-bound-values/modifying-bound-values.html">Modifying Bound Values</a></li>
+                                <li><a href="/module-03/modifying-bound-values/trimming-string-values.html">Trimming String Values</a></li>
+                                <li><a href="/module-03/modifying-bound-values/number-modifier.html">Converting Values to Numbers</a></li>                                
+                            </ul>                            
                         </div>
                     </div>
                 </div>
@@ -136,23 +145,5 @@
         <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-
-        <script type="text/javascript">
-            document.getElementById('test').onkeydown = function() {
-                console.log('on key down');
-            };
-
-            document.getElementById('test').onkeypress = function() {
-                console.log('on key press');
-            };            
-        
-            document.getElementById('test').onkeyup = function() {
-                console.log('on key up');
-            };
-
-            document.getElementById('test').oninput = function() {
-                console.log('on input');
-            };                        
-        </script>
     </body>
 </html>
