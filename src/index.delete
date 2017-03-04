@@ -1,0 +1,1436 @@
+<!--
+    This sample code is intended to be used for inspiration.
+    It is not 100% bullet proof. 
+    If you use this code, you're responsible for testing it.
+-->
+<html>
+    <head>
+        <title>Growler</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" href="http://rawgit.com/bassjobsen/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" rel="stylesheet" media="screen">
+        
+        <style>
+            .add-button {
+                position:relative;
+                top: -6px;
+            }
+            .result-logo {
+                font-size:42px;
+                padding-top:8px;
+            }
+            
+            .rating-star {
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+            
+            .help {
+                padding-left:8px;
+            }  
+        </style>
+    </head>
+    <body>        
+        <div class="container">
+            <div class="row" style="padding:1rem 0rem 0rem;">
+                <div class="col-lg-3">
+                    <ul class="list-inline">
+                        <li><h2 style="margin:0; padding:0;">Growler</h2></li>
+                        <li><i class="fa fa-info-circle" style="font-size:24px; cursor:pointer;" onclick="showInfo();"></i></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-5">
+                    <!-- The search field -->
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="search" class="form-control" id="queryField" placeholder="please enter your query here." data-toggle="tooltip" data-placement="left" title="This value is used in the 'search' parameter of the query.">
+                                <div class="input-group-btn" data-toggle="tooltip" data-placement="right" title="This field toggles between which search index the query will be executed against.">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="searchIndexButton">Beers</span> <span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a id="beersSearchIndex" href="#">Beers</a></li>
+                                        <li><a id="breweriesSearchIndex" href="#">Breweries</a></li>
+                                    </ul>
+                                </div>
+                            </div>                            
+                        </div>
+                    </form>                    
+                </div>
+                
+                <div class="col-lg-2">
+                    <button id="searchButton" type="button" class="btn btn-primary">Search</button>
+                    <i id="warningIcon" class="fa fa-warning" data-toggle="tooltip" data-placement="bottom" title="" style="font-size:18px; position:relative; top:4px; left:8px"></i>
+                </div>
+                
+                <div class="col-lg-2" style="padding-left:0px;">
+                    <ul class="list-inline">
+                        <li>
+                            <div class="checkbox" style="position:relative; top:-4px;">
+                                <label data-toggle="tooltip" data-placement="bottom" title="This toggles between 'simple' and 'full' queries. Both are discussed in Module 4."><input id="powerSyntaxCheckBox" type="checkbox"> Power Syntax?</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="btn-group add-button" data-toggle="tooltip" data-placement="left" title="This button will let you add a document to either the 'beers' or 'breweries' search index.">
+                                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-plus"></span> <span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li><a id="addNewBeerLink" href="#">Beer</a></li>
+                                    <li><a id="addNewBreweryLink" href="#">Brewery</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr style="margin-top:0px;" />
+            
+            <!-- Display the facets and the results -->
+            <div id="noResultUI" class="row">
+                <!-- This is intentionally blank. This is just a placeholder until a query is executed. -->
+            </div>
+            
+            <div id="resultUI" class="row" style="display:none;">
+                <div class="col-lg-3">                    
+                    <div class="form-group" style="padding-right:16px;">
+                        <button id="clearFiltersButton" class="btn btn-danger btn-block" style="margin-bottom:16px;">Clear Filters</button>
+                        
+                        <label for="boostField">Boost <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates the use of a 'scoring profile'."></span></label>
+                        <select id="boostField" class="form-control">
+                            <option>alcohol by volume</option>                      <!-- This is intended to demonstrate searches that use a 'magnitude' scoring function -->
+                            <option>beer name</option>                              <!-- This is intended to demonstrate searches that use a 'text' weighting -->
+                            <option>beer freshness</option>                         <!-- This is intended to demonstrate searches that use a 'freshness' scoring function -->
+                            <option>distance</option>                               <!-- This is intended to demonstrate searches that use a 'distance' scoring function -->
+                            <option>chocolatey beers</option>                       <!-- This is intended to demonstrate searches that use a 'tag' scoring function -->
+                            <option selected="selected">(nothing)</option>          <!-- Use the default TF-IDF algorithm for scoring -->
+                        </select><br />
+                        
+                        <label for="sortChoice">Sort By <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates the 'orderby' property."></span></label>
+                        <select id="sortChoice" class="form-control">
+                            <option value="score">relavance</option>
+                            <option value="name">name</option>
+                        </select><br />
+                                                
+                        <div id="beerFilters">
+                            <hr />                        
+                            <label for="ibuField">Maximum IBU <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="The maximum international bitterness units to consider. This demonstrates a numeric 'filter'."></span></label>
+                            <div class="row">
+                                <div class="col-sm-8"><input type="text" class="form-control" id="ibuField" name="ibuField" /></div>
+                                <div class="col-sm-4"><button id="applyFilterButton" class="btn btn-info">apply</button></div>
+                            </div>
+                        </div>
+                        
+                        <hr />
+                        
+                        <div id="beerFacets">                            
+                            <label>By Brewery <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates a 'facet'."></span></label>
+                            <ul id="breweryFacet" class="list-unstyled"></ul>
+                            <br />
+
+                            <label>By ABV <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates an intervaled 'facet' with numbers."></span></label>
+                            <ul id="abvFacet" class="list-unstyled"></ul>
+                            <br />                            
+                                                
+                            <label>By Last Tapped Date <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates an intervaled 'facet' with dates."></span></label>
+                            <ul id="lastTappedFacet" class="list-unstyled"></ul>
+                        </div>
+                        
+                        <div id="breweryFacets">
+                            <label>By Type <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="This demonstrates a 'facet'."></span></label>
+                            <ul id="breweryTypeFacet" class="list-unstyled"></ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <!-- Search results -->
+                    <div class="row"><div id="searchResults" class="col-lg-12"></div></div>                                            
+                    
+                    <!-- Pager -->
+                    <div class="row">
+                        <div class="col-lg-2"></div>
+                        <div class="col-lg-10">
+                            <nav>
+                                <ul id="resultsPager" class="pagination">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>                    
+                </div>
+                
+                <div class="col-lg-offset-1 col-lg-2 pull-right">
+                    <form action="#">                        
+                        <div class="form-group">
+                            <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration.">Query Duration</label>
+                            <p><span id="queryDuration"></span></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-toggle="tooltip" data-placement="left" title="This demonstrates the 'count' parameter.">Query Results</label>
+                            <p><span id="queryResultCount"></span></p>
+                        </div>           
+                        
+                        <div class="form-group">
+                            <label data-toggle="tooltip">Disclaimer</label>
+                            <p>
+                                The data in this search service is fictional.
+                                It is not intended to be used for real beers.
+                                <br /><br />
+                                The data in this search service is in a shared environment.
+                                There may be other individuals modifying the data while you're using it.                                
+                                Please be aware that you may experience unexpected results because of this.
+                                <br /><br />
+                                You can reset the data to its original state by clicking the button below.
+                                <br /><br />
+                                <button id="resetButton" class="btn btn-danger" data-toggle="tooltip" data-placement="left" title="This will reset growler to its original state.">Reset Data</button>
+                            </p>
+                        </div>                        
+                    </form>                    
+                </div>
+            </div>
+        </div>
+        
+        <!-- Beer Dialog -->
+        <div id="beerModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Beer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="beerName">Name</label>
+                                        <input type="text" class="form-control" id="beerName" placeholder="">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="beerBrewery">Brewery</label>
+                                        <select id="beerBrewery" class="form-control"></select>
+                                    </div>                                    
+                                </div>
+                            </div>
+                            
+                            <hr />
+                            
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="beerIsActivelyBrewed">Actively Brewed?</label><br />
+                                        <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedYes" value="true" checked> Yes</label>
+                                        <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedNo" value="false"> No</label>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="beerLastTappedOn">Last Tapped On</label>
+                                        <div class='input-group date' id='beerLastTappedOn'>                                        
+                                            <input type="text" class="form-control" id="beerLastTappedOnDate">
+                                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="beerIbu">IBU (International Bitterness Units)</label>
+                                        <input type="text" class="form-control" id="beerIbu" placeholder="i.e. 60">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="beerAbv">ABV (Alchohol by Volume)</label>
+                                        <input type="text" class="form-control" id="beerAbv" placeholder="i.e. 5.4">
+                                    </div>                                    
+                                </div>
+                                
+                                <div class="col-sm-6">
+                                    <label for="flavors">Flavors</label>
+                                    <div class="panel panel-default"  style="height:244px; overflow-y:scroll;">
+                                        <div class="panel-body" style="padding-top:0px; padding-bottom:0px;">
+                                            <div class="checkbox"><label><input id="beerBananaFlavor" type="checkbox" value="">Banana</label></div>
+                                            <div class="checkbox"><label><input id="beerBiscuityFlavor" type="checkbox" value="">Biscuity</label></div>
+                                            <div class="checkbox"><label><input id="beerBourbonFlavor" type="checkbox" value="">Bourbon</label></div>
+                                            <div class="checkbox"><label><input id="beerBreadFlavor" type="checkbox" value="">Bread</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerButterFlavor" type="checkbox" value="">Butter</label></div>
+                                            <div class="checkbox"><label><input id="beerCaramelFlavor" type="checkbox" value="">Caramel</label></div>
+                                            <div class="checkbox"><label><input id="beerCitrusFlavor" type="checkbox" value="">Citrus</label></div>
+                                            <div class="checkbox"><label><input id="beerChocolateFlavor" type="checkbox" value="">Chocolate</label></div>
+                                            <div class="checkbox"><label><input id="beerCoffeeFlavor" type="checkbox" value="">Coffee</label></div>
+                                            <div class="checkbox"><label><input id="beerDriedFruitFlavor" type="checkbox" value="">Dried Fruit</label></div>
+                                            <div class="checkbox"><label><input id="beerFloralFlavor" type="checkbox" value="">Floral</label></div>
+                                            <div class="checkbox"><label><input id="beerFruitFlavor" type="checkbox" value="">Fruit</label></div>
+                                            <div class="checkbox"><label><input id="beerGrapefruitFlavor" type="checkbox" value="">Grapefruit</label></div>
+                                            <div class="checkbox"><label><input id="beerGrassFlavor" type="checkbox" value="">Grass</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerHoneyFlavor" type="checkbox" value="">Honey</label></div>
+                                            <div class="checkbox"><label><input id="beerHopsFlavor" type="checkbox" value="">Hops</label></div>
+                                            <div class="checkbox"><label><input id="beerLicoriceFlavor" type="checkbox" value="">Licorice</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerMaltFlavor" type="checkbox" value="">Malt</label></div>
+                                            <div class="checkbox"><label><input id="beerOrangeFlavor" type="checkbox" value="">Orange</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerPineFlavor" type="checkbox" value="">Pine</label></div>
+                                            <div class="checkbox"><label><input id="beerPumpkinFlavor" type="checkbox" value="">Pumpkin</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerRaisinFlavor" type="checkbox" value="">Raisin</label></div>
+                                            <div class="checkbox"><label><input id="beerSausageFlavor" type="checkbox" value="">Sausage</label></div>
+                                            <div class="checkbox"><label><input id="beerSmokeFlavor" type="checkbox" value="">Smoke</label></div>
+                                            <div class="checkbox"><label><input id="beerTangerineFlavor" type="checkbox" value="">Tangerine</label></div>
+                                            <div class="checkbox"><label><input id="beerVanillaFlavor" type="checkbox" value="">Vanilla</label></div>                                            
+                                            <div class="checkbox"><label><input id="beerWheatFlavor" type="checkbox" value="">Wheat</label></div>
+                                            <div class="checkbox"><label><input id="beerWoodFlavor" type="checkbox" value="">Wood</label></div>
+                                            <div class="checkbox"><label><input id="beerYeastFlavor" type="checkbox" value="">Yeast</label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                        
+                            <hr />
+                            
+                            <div class="form-group">
+                                <label for="beerDescription">Description</label>
+                                <textarea id="beerDescription" class="form-control"></textarea>
+                            </div>                                                      
+                        </form>
+                    </div>
+      
+                    <div class="modal-footer">
+                        <div class="pull-left text-muted">
+                            <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new beer."></span>
+                            <span>Generated Beer ID:</span>
+                            <span id="beerId"></span>
+                        </div>                        
+                        
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button id="saveBeerButton" type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Beer Result Dialog -->
+        <div id="beerResultModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Beer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#beerResultInfo">Info</a></li>
+                            <li><a data-toggle="tab" href="#beerResultFlavors">Flavors</a></li>                            
+                            <li><a data-toggle="tab" href="#beerResultBrewery">Brewery</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="beerResultInfo" class="tab-pane fade in active">
+                                <div style="padding:12px;">
+                                    <div class="row">
+                                        <div class="col-xs-8">
+                                            <div class="form-group">
+                                                <label for="beerResultName">Name</label>
+                                                <p id="beerResultName">[name]</p>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="beerResultDescription">Description</label>
+                                                <p id="beerResultDescription"></p>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="col-xs-4">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="beerResultIbu">IBU</label>
+                                                        <p id="beerResultIbu"></p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="beerResultAbv">ABV</label>
+                                                        <p id="beerResultAbv"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="beerResultStatus">Actively Brewed</label>
+                                                <p id="beerResultStatus">[status]</p>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="beerResultLastTappedOn">Last Tapped On</label>
+                                                <p id="beerResultLastTappedOn">[last tapped on]</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                                
+                            </div>
+
+                            <div id="beerResultFlavors" class="tab-pane fade in">
+                                <div style="padding:12px">
+                                    <div class="form-group">
+                                        <label for="beerResultFlavorList">Flavors</label>
+                                        <p id="beerResultFlavorList"></p>
+                                    </div>                                    
+                                </div>
+                            </div>
+
+                            <div id="beerResultBrewery" class="tab-pane fade">
+                                <div style="padding:12px;">
+                                    <div class="form-group">
+                                        <label for="beerResultBreweryName">Name</label>
+                                        <p id="beerResultBreweryName">[name]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+      
+                    <div class="modal-footer">
+                        <div class="pull-left text-muted">
+                            <span>Beer ID:</span>
+                            <span id="beerResultId"></span>
+                        </div>                        
+                        
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+                       
+
+        <!-- Brewery Dialog -->
+        <div id="breweryModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Brewery</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div id="breweryErrorAlert" class="alert alert-danger collapse" role="alert">
+                                <span><i class="fa fa-times-circle"></i>&nbsp;Error:</span>
+                                <span>There was a problem. Please check the console window for more details.</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="breweryName">Name</label>
+                                <input type="text" class="form-control" id="breweryName" placeholder="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="brewerySlogan">Slogan</label>
+                                <input type="text" class="form-control" id="brewerySlogan" placeholder="something witty goes here">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="breweryDescription">Description</label>
+                                <textarea id="breweryDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="breweryType">Type of Brewery</label>
+                                        <select id="breweryType" class="form-control">
+                                            <option value="nano">Nano</option>
+                                            <option value="micro">Micro</option>
+                                            <option value="farm">Farm</option>
+                                            <option value="regional">Regional</option>
+                                            <option value="macro">Macro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="breweryLatitude">Latitude</label>
+                                        <input type="text" class="form-control" id="breweryLatitude">
+                                    </div>
+                                </div>
+                            
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="breweryLongitude">Longitude</label>
+                                        <input type="text" class="form-control" id="breweryLongitude">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+      
+                    <div class="modal-footer">
+                        <div class="pull-left text-muted">
+                            <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new brewery."></span>                            
+                            <span>Generated Brewery ID:</span>
+                            <span id="breweryId"></span>
+                        </div>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button id="saveBreweryButton" type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Dialog -->
+        <div id="infoModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">About</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            A special thanks to those in the open source community.
+                            I'm thankful for the efforts involved in creating the components this app uses.
+                            This app uses the following components and I'm thankful to their contributors.
+                        </p> 
+                        
+                        <table class="table">
+                            <thead>
+                                <th>Library</th>
+                                <th>Version</th>
+                                <th>License</th>
+                            </thead>
+                            
+                            <tbody>
+                                <tr>
+                                    <td><a href="http://getbootstrap.com/" target="_blank">Bootstrap</a></td>
+                                    <td>3.3.6</td>
+                                    <td><a href="https://github.com/twbs/bootstrap/blob/v3.3.6/LICENSE" target="_blank">MIT</a></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><a href="https://eonasdan.github.io/bootstrap-datetimepicker/" target="_blank">Bootstrap Datepicker</a></td>
+                                    <td>4.17.37</td>
+                                    <td><a href="https://github.com/Eonasdan/bootstrap-datetimepicker/blob/v4.14.30/LICENSE" target="_blank">MIT</a></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><a href="https://jquery.com/" target="_blank">JQuery</a></td>
+                                    <td>1.11.3</td>
+                                    <td><a href="https://github.com/jquery/jquery/blob/1.11.3/MIT-LICENSE.txt" target="_blank">MIT</a></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><a href="https://twitter.github.io/typeahead.js/" target="_blank">Typeahead</a></td>
+                                    <td>0.11.1</td>
+                                    <td><a href="https://github.com/twitter/typeahead.js/blob/v0.11.1/LICENSE" target="_blank">MIT</a></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><a href="http://momentjs.com/" target="_blank">Moment.js</a></td>
+                                    <td>2.13.0</td>
+                                    <td><a href="https://github.com/moment/moment/blob/2.13.0/LICENSE" target="_blank">MIT</a></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><a href="https://github.com/bassjobsen/typeahead.js-bootstrap-css" target="_blank">Typeahead.js-bootstrap-css</a></td>
+                                    <td>1.2.1</td>
+                                    <td><a href="https://github.com/bassjobsen/typeahead.js-bootstrap-css/blob/1.2.1/LICENSE.md" target="_blank">MIT</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+      
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>            
+        </div>
+        
+        <!-- 
+            Google Analytics is included to identify if individuals find the sample useful.
+            This data is used to identify if in-depth examples should be created for future courses.
+        -->
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-78628669-2', 'auto');
+            ga('send', 'pageview');
+        </script>
+
+        <!-- Import External Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script src="https://twitter.github.io/typeahead.js/releases/0.11.1/typeahead.bundle.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            // The client-side state
+            var viewModel = { searchIndex:'beers', orderBy:'score', searchStartedAt:null, queryType:'simple', facets:[], filters:[], filterCount:0, location:null, currentPage:1, pageSize:7 };
+            
+            // The Azure Search service configuration
+            var azureSearchService = {
+                url: 'https://ecofic-growler-dev.search.windows.net/indexes',
+                apiParam: 'api-version=2015-02-28',
+                apiKey: 'D71CECC93600E296532BDA6DAECD1687',
+                headers: {
+                    'api-key':'D71CECC93600E296532BDA6DAECD1687',
+                    'Content-Type':'application/json'
+                }
+            };
+            
+            // The service behind the app. 
+            var appService = {
+                url: 'http://ecofic.com/about/publications/courses/adding-search-abilities-to-your-apps-with-azure-search/add',                
+                headers: {
+                    'api-key':'D71CECC93600E296532BDA6DAECD1687',
+                    'Content-Type':'application/json'                    
+                }
+            }
+            
+            function generateId(useInts) {
+                var id = '';
+                if (useInts) {
+                    // Generate a random number between 100 and 1,000,000,000.
+                    // We're trying to avoid collisions. This is not a robust approach. This is intended for demonstration purposes only.                    
+                    var temp = Math.floor((Math.random() * 1000000000) + 100);
+                    id = temp.toString();
+                } else {
+                    // Generate a random string of 9 characters
+                    // Once again, this is not a robust approach. This is intended for demonstration purposes only.
+                    var pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+                    for (var i=0; i<9; i++) {
+                        var c = pool.charAt(Math.floor(Math.random() * pool.length));
+                        id += c;
+                    }
+                }
+                return id;
+            }
+            
+            /**
+             * Responds to a successful search query.
+             */
+            function onSearchSuccess(results) {
+                var html = "";                
+                for (var i=0; i<results.value.length; i++) {
+                    var resultHtml = "";
+                    if (viewModel.searchIndex === 'beers') { 
+                        if (!viewModel.location) {
+                            toggleWarning('Your location was not loaded. Growler cannot calculate the distances without your location. Sometimes it takes a couple of seconds when the app loads.', true);
+                        } else {
+                            toggleWarning('', false);                            
+                        }
+                                               
+                        // Generate the HTML for a beer result.
+                        var beer = results.value[i];
+                        var distanceToBeer = calculateDistance(viewModel.location, beer.breweryLocation);
+                        
+                        var lastTappedOn = 'unknown';
+                        if (beer.lastTappedOn) {
+                            lastTappedOn = beer.lastTappedOn.substring(0, beer.lastTappedOn.length-1);  // remove the last 'Z' for the purpose of conversion.
+                            lastTappedOn = moment(lastTappedOn, 'YYYY-MM-DDTHH:mm:ss').format('MM/DD/YYYY');
+                        }
+                        
+                        var beerName = beer.name;
+                        if (beer['@search.highlights']) {
+                            var highlights = beer['@search.highlights'];
+                            if (highlights.name.length > 0) {
+                                beerName = highlights.name[0];
+                            }
+                        }
+                        
+                        resultHtml = [
+                            "<div class='row'>",
+                            "  <div class='col-lg-2'><span class='fa fa-beer result-logo' aria-hidden='true'></span></div>",
+                            "  <div class='col-lg-10'>",
+                            "    <h5 onclick=\"showBeerInfo('" + beer.id + "');\" style=\"cursor:pointer;\">" + beerName + "</h5>",
+                            "    <p>" + beer.breweryName + " (" + distanceToBeer + ")</p>",
+                            "    <ul class='list-inline text-muted'>",
+                            "      <li>ibu: " + beer.ibu + "</li>",
+                            "      <li>abv: " + beer.abv + "</li>",
+                            "      <li>last tapped: " + lastTappedOn + "</li>",
+                            "      <li><ul class='list-inline'>",
+                            "      <li>&nbsp;&nbsp;score: " + beer['@search.score'] + "</li>",
+                            "    </ul>",
+                            "  </div>",
+                            "</div><br />"
+                        ].join("\n");                        
+                    } else if (viewModel.searchIndex === 'breweries') {
+                        // Generate the HTML for a brewery result.
+                        var brewery = results.value[i];                        
+                        var distanceToBrewery = calculateDistance(viewModel.location, brewery.location);
+                        
+                        resultHtml = [
+                            "<div class='row'>",
+                            "  <div class='col-lg-2'><span class='fa fa-industry result-logo' aria-hidden='true'></span></div>",
+                            "  <div class='col-lg-10'>",
+                            "    <h5>" + brewery.name + "</h5>",
+                            "    <p>type:" + brewery.breweryType + "</p>",
+                            "    <ul class='list-inline text-muted'>",
+                            "      <li>distance: " + distanceToBrewery + "</li>",
+                            "      <li>&nbsp;&nbsp;score: " + brewery['@search.score'] + "</li>",
+                            "    </ul>",
+                            "  </div>",
+                            '</div><br />'
+                        ].join("\n");                                             
+                    }                                                           
+                    html = html + resultHtml;
+                }
+                                                               
+                // Update the UI
+                $('#searchResults').html(html);
+                $('#queryDuration').text('todo');
+                $('#queryResultCount').text(results['@odata.count'] + ' ' + viewModel.searchIndex);
+                updatePager(results['@odata.count']);
+                
+                if (viewModel.searchIndex === 'beers') {
+                    $('#breweryFacet').html(getFacetHtmlForField('breweryName', results, 'string'));
+                    $('#abvFacet').html(getFacetHtmlForField('abv', results, 'decimal'));
+                    $('#lastTappedFacet').html(getFacetHtmlForField('lastTappedOn', results, 'date'));                    
+                    
+                    $('#beerFilters').show();
+                    $('#beerFacets').show();
+                    $('#breweryFacets').hide();                                   
+                } else if (viewModel.searchIndex === 'breweries') {
+                    $('#breweryTypeFacet').html(getFacetHtmlForField('breweryType', results, 'string'));
+
+                    $('#beerFilters').hide();                    
+                    $('#beerFacets').hide();
+                    $('#breweryFacets').show();                    
+                }
+            }
+            
+            function updatePager(totalResultCount) {
+                if (totalResultCount < viewModel.pageSize) {
+                    $('#resultsPager').hide();
+                } else {
+                    var totalPages = (totalResultCount + viewModel.pageSize - 1) / viewModel.pageSize;                    
+                    $('#resultsPager').empty();
+                    
+                    var pageItems = '';
+                    for (var i=1; i<=totalPages; i++) {
+                        if (i === viewModel.currentPage) {
+                            pageItems += '<li class="active">';
+                        } else {
+                            pageItems += '<li>';
+                        }
+                        
+                        pageItems += '<a href="#" onclick="executeSearch(' + i + ');">' + i + '</a></li>';          
+                    }
+                                        
+                    $('#resultsPager').append(pageItems);                    
+                    $('#resultsPager').show();                    
+                }                                
+            }
+            
+            function getFacetHtmlForField(fieldName, results, fieldType) {
+                var html = '';
+                
+                var facets = results['@search.facets'];
+                if (facets) {
+                    if (facets[fieldName]) {
+                        viewModel.facets[fieldName] = [];
+                        
+                        for (var i=0; i<facets[fieldName].length; i++) {
+                            var facetOption = facets[fieldName][i];
+                            var facetDisplay = facetOption.value;
+                            
+                            // Build the filter to be applied if a user clicks the facet
+                            var facetFilter = '';
+                            if (fieldType === 'date') {                                
+                                facetDisplay = moment(facetDisplay).format('MMMM YYYY');
+                                if (i < (facets[fieldName].length-1)) {
+                                    facetFilter = 
+                                        fieldName + ' ge ' + moment(facetOption.value).toISOString() + ' and ' +
+                                        fieldName + ' lt ' + moment(facets[fieldName][i+1].value).toISOString()
+                                    ;                                    
+                                } else {
+                                    facetFilter = fieldName + ' ge ' + moment(facetOption.value).toISOString();                                    
+                                }
+                            } else if (fieldType === 'string') {
+                                facetFilter = fieldName + " eq '" + facetOption.value + "'";
+                            } else if (fieldType === 'decimal') {
+                                if (i < (facets[fieldName].length-1)) {
+                                    facetFilter =
+                                        fieldName + ' ge ' + facetOption.value + ' and ' +
+                                        fieldName + ' lt ' + facets[fieldName][i+1].value
+                                    ;                                    
+                                } else {
+                                    facetFilter = fieldName + ' ge ' + facetOption.value;                                    
+                                }
+                            }
+                            
+                            if (facetFilter) {
+                                viewModel.facets[fieldName][facetDisplay] = '(' + facetFilter + ')';
+                                var clickEvent = "return filterOnFacet('" + fieldName + "', '" + facetDisplay + "');";
+                                html += '<li><a href="#" onclick="' + clickEvent + '">' + facetDisplay + ' (' + facetOption.count + ')</a></li>';                                
+                            }
+                        }
+                    }                    
+                }
+                return html;
+            }
+            
+            function filterOnFacet(fieldName, facetDisplay) {
+                var facetFilter = viewModel.facets[fieldName][facetDisplay];
+                viewModel.filters[fieldName] = facetFilter;
+                executeSearch(1);
+                return false;
+            }
+            
+            /**
+             * Reacts to a user requesting to add a new brewery.
+             */
+            function onAddNewBreweryButtonClick() {
+                // Reset the brewery fields
+                $('#breweryId').text(generateId(false));
+                $('#breweryName').val('');
+                $('#brewerySlogan').val('');
+                $('#breweryDescription').val('');
+                $('#breweryLatitude').val('');
+                $('#breweryLongitude').val('');
+                
+                $('#breweryModal').modal('show');         
+            }
+            
+            /**
+             * Reacts to a user requesting to add a new beer.
+             */
+            function onAddNewBeerButtonClick() {
+                // Reset the beer fields                
+                $('#beerId').text(generateId(true));
+                $('#beerName').val('');
+                $('#beerDescription').val('');
+                $('#beerIbu').val('');
+                $('#beerAbv').val('');
+                $('#beerIsActivelyBrewedYes').prop('checked', true);                
+                $('#beerLastTappedOn').data('DateTimePicker').clear();
+                
+                $('#beerModal').modal('show');
+            }
+            
+            /**
+             * Reacts to a user clicking the "Save" brewery button.
+             * NOTE: The data validation is somewhat lacking here. The focus is on getting data into Azure Search.
+             */
+            function onSaveBreweryButtonClick() {
+                // Get the brewery data from the form.
+                var breweryData = {
+                    '@search.action':'upload',
+                    'id': $('#breweryId').html(),
+                    'name': $('#breweryName').val(),
+                    'slogan': $('#brewerySlogan').val(),
+                    'description': $('#breweryDescription').val(),
+                    'breweryType': $('#breweryType').val(),
+                };
+                
+                // Determine whether or not to include the brewery's location
+                if (($('#breweryLatitude').val().length > 0) && ($('#breweryLongitude').val().length > 0)) {
+                    breweryData.location = {
+                        'type': 'Point',
+                        'coordinates': [
+                            parseFloat($('#breweryLatitude').val()), 
+                            parseFloat($('#breweryLongitude').val())]
+                    };
+                }
+                
+                // Post the brewery data
+                var saveUrl = appService.url;
+                $.ajax({ 
+                    type: 'POST', url: saveUrl, cache: 'false',
+                    contentType:'application/json',
+                    headers: appService.headers,
+                    data: JSON.stringify({
+                        'value': [
+                            breweryData
+                        ]
+                    }),
+                    success: onBrewerySaved,
+                    error: onBrewerySaveError
+                });                   
+            }
+            
+            /**
+             * Responds to a successfully saved brewery.
+             */
+            function onBrewerySaved() {                
+                loadBreweries();         
+                $('#breweryModal').modal('hide');
+                alert('"' + $('#breweryName').val() + '" was successfully added.');
+            }
+            
+            /**
+             * Responds to a failed attempt at saving a brewery.
+             */
+            function onBrewerySaveError(xhr, status, err) {
+                $('#breweryErrorAlert').show();
+                console.log('status: ');
+                console.log(status);
+                
+                console.log('err: ');
+                console.log(err);
+                
+                console.log('XmlHttpRequest: ');
+                console.log(xhr);
+            }
+            
+            /**
+             * Reacts to the user clicking a beer result.
+             */
+            function showBeerInfo(beerId) {
+                var infoUrl = azureSearchService.url + '/' + viewModel.searchIndex + '/docs/' + beerId + '?'
+                    + azureSearchService.apiParam                                       // Add the required api-version parameter.
+                ;
+
+                $('#beerResultModal').modal('show');
+                $.ajax({
+                    url: infoUrl, cache: 'false',
+                    contentType:'application/json',
+                    headers: azureSearchService.headers,
+                    success: onBeerInfoSuccess,
+                    error: function(xhr, status, err) {
+                        logRequestError(xhr, status, err);
+                    }
+                });
+            }
+
+            /**
+             * Reacts to the a successful retrieval of the beer.
+             */
+            function onBeerInfoSuccess(info) {
+                $('#beerResultId').html(info.id);                
+                $('#beerResultName').html(info.name);
+
+                if (info.description) {
+                    $('#beerResultDescription').html(info.description);
+                } else {
+                    $('#beerResultDescription').html('<i>(none available)</i>');
+                }
+
+                var status = info.activelyBrewed ? 'actively brewed' : 'unavailable';
+                $('#beerResultStatus').html(status);
+
+                var lastTappedOn = 'unknown';
+                if (info.lastTappedOn) {
+                    lastTappedOn = info.lastTappedOn.substring(0, info.lastTappedOn.length-1);  // remove the last 'Z' for the purpose of conversion.
+                    lastTappedOn = moment(lastTappedOn, 'YYYY-MM-DDTHH:mm:ss').format('MM/DD/YYYY');
+                }
+                $('#beerResultLastTappedOn').html(lastTappedOn);
+
+                $('#beerResultIbu').html(info.ibu);
+                $('#beerResultAbv').html(info.abv);
+
+                // Add the flavor details
+                var flavorList = '';
+                if (info.flavors !== null) {
+                    for (var fi=0; fi<info.flavors.length; fi++) {
+                        flavorList += info.flavors[fi];
+                        if (fi < (info.flavors.length-1)) {
+                            flavorList += ', ';
+                        }
+                    }
+                }
+
+                if (flavorList.length === 0) {
+                    $('#beerResultFlavorList').html('<i>(none)</i>');
+                } else {
+                    $('#beerResultFlavorList').html(flavorList);
+                }
+
+                // Add the brewery details
+                $('#beerResultBreweryName').html(info.breweryName);
+            }
+            
+            /**
+             * Reacts to the user clicking the "Save" beer button.
+             */
+            function onSaveBeerButtonClick() {
+                // Get the date the beer was last tapped on based on the user's selection.                
+                var lastTappedOn = $('#beerLastTappedOn').data('DateTimePicker').date();
+                if (lastTappedOn) {
+                    lastTappedOn = lastTappedOn.format('YYYY-MM-DDTHH:mm:ss');
+                }
+
+                // Get the selected brewery
+                var selectedBrewery = {};
+                if ($('#beerBrewery:selected')) {
+                    var brewery = $('#beerBrewery:selected');
+                    selectedBrewery.id = $(brewery).val();
+                    selectedBrewery.name = $(brewery).text();
+                }
+                
+                // Get the beer data from the form.                
+                var beerData = {
+                    '@search.action':'upload',
+                    'id': $('#beerId').val(),
+                    'name': $('#beerName').val(),
+                    'description': $('#beerDescription').val(),
+                    'activelyBrewed': $('input:radio[name=beerIsActivelyBrewed]:checked').val(),
+                    'ibu': $('#beerIbu').val(),
+                    'abv': $('#beerAbv').val(),
+                    'flavors': getBeerFlavors(),
+                    'lastTappedOn': lastTappedOn,
+                    'breweryId': '',
+                    'breweryName': '',
+                    'breweryLocation': ''
+                };
+                $('#beerModal').modal('hide');                
+            }
+            
+            function getBeerFlavors()
+            {                
+                var flavors = [];
+                if(document.getElementById('beerBananaFlavor').checked) {
+                    flavors.push('Banana');
+                }  
+                if (document.getElementById('beerBiscuityFlavor').checked) {
+                    flavors.push('Biscuity');
+                }
+                if (document.getElementById('beerBourbonFlavor').checked) {
+                    flavors.push('Bourbon');
+                }
+                if (document.getElementById('beerBreadFlavor').checked) {
+                    flavors.push('Bread');
+                }
+                if (document.getElementById('beerButterFlavor').checked) {
+                    flavors.push('Butter');
+                }
+                if (document.getElementById('beerCaramelFlavor').checked) {
+                    flavors.push('Caramel');
+                }
+                if (document.getElementById('beerCitrusFlavor').checked) {
+                    flavors.push('Citrus');
+                }
+                if (document.getElementById('beerChocolateFlavor').checked) {
+                    flavors.push('Chocolate');
+                }
+                if (document.getElementById('beerCoffeeFlavor').checked) {
+                    flavors.push('Coffee');
+                }
+                if (document.getElementById('beerDriedFruitFlavor').checked) {
+                    flavors.push('Dried Fruit');
+                }
+                if (document.getElementById('beerFloralFlavor').checked) {
+                    flavors.push('Floral');
+                }
+                if (document.getElementById('beerFruitFlavor').checked) {
+                    flavors.push('Floral');
+                }
+                if (document.getElementById('beerGrapefruitFlavor').checked) {
+                    flavors.push('Grapefruit');
+                }
+                if (document.getElementById('beerGrassFlavor').checked) {
+                    flavors.push('Grass');
+                }
+                if (document.getElementById('beerHoneyFlavor').checked) {
+                    flavors.push('Honey');
+                }
+                if (document.getElementById('beerHopsFlavor').checked) {
+                    flavors.push('Hops');
+                }
+                if (document.getElementById('beerLicoriceFlavor').checked) {
+                    flavors.push('Licorice');
+                }
+                if (document.getElementById('beerMaltFlavor').checked) {
+                    flavors.push('Malt');
+                }
+                if (document.getElementById('beerOrangeFlavor').checked) {
+                    flavors.push('Orange');
+                }
+                if (document.getElementById('beerPineFlavor').checked) {
+                    flavors.push('Pine');
+                }
+                if (document.getElementById('beerPumpkinFlavor').checked) {
+                    flavors.push('Pumpkin');
+                }
+                if (document.getElementById('beerRaisinFlavor').checked) {
+                    flavors.push('Raisin');
+                }
+                if (document.getElementById('beerSausageFlavor').checked) {
+                    flavors.push('Sausage');
+                }
+                if (document.getElementById('beerSmokeFlavor').checked) {
+                    flavors.push('Smoke');
+                }
+                if (document.getElementById('beerTangerineFlavor').checked) {
+                    flavors.push('Tangerine');
+                }
+                if (document.getElementById('beerVanillaFlavor').checked) {
+                    flavors.push('Vanilla');
+                }
+                if (document.getElementById('beerWheatFlavor').checked) {
+                    flavors.push('Wheat');
+                }
+                if (document.getElementById('beerWoodFlavor').checked) {
+                    flavors.push('Wood');
+                }
+                if (document.getElementById('beerYeastFlavor').checked) {
+                    flavors.push('Yeast');
+                }
+                return flavors;
+            }
+            
+            /**
+             * Responds to a failed search query.
+             */
+            function onSearchFailure(xhr, status, err) {
+                if (status === 'error') {
+                    $('#resultUI').html('<h3>An error occurred.<br /><small>please check the console window</small></h3>');
+                    logRequestError(xhr, status, err);
+                }
+            }
+            
+            /**
+             * Responds to the completion of a search (whether success or failure)
+             */
+            function onSearchComplete() {
+                var duration = new Date().getTime() - viewModel.searchStartedAt;
+                $('#queryDuration').text(duration + ' ms');
+                
+                // Toggle the UI if needed
+                $('#noResultUI').css('display', 'none');
+                $('#resultUI').css('display', 'inline');
+                
+                // Toggle the "Clear Filters" display
+                if (viewModel.filterCount > 0) {
+                    $('#clearFiltersButton').css('display', 'inline');
+                } else {
+                    $('#clearFiltersButton').css('display', 'none');
+                }                
+            }
+            
+            /**
+             * This function will remove any filters / facets that have been applied
+             * to a search.
+             */
+            function clearFilters() {
+                viewModel.filters = [];
+                executeSearch(1);
+            }
+            
+            /**
+             * This acts like a new search is being run.
+             */
+            function executeNewSearch() {
+                viewModel.orderBy = 'score';
+                $("select#sortChoice").prop('selectedIndex', 0);
+                    
+                $('#ibuField').val('');                  
+                viewModel.filters = [];
+                executeSearch(1);                
+            }
+                                                        
+            /**
+             * Gets the query then executes a search against the selected
+             * Azure Search index via a POST.
+             */
+            function executeSearch(skipToPage) {
+                var query = $('#queryField').val().trim();                
+                var searchUrl = azureSearchService.url + '/' + viewModel.searchIndex + '/docs/search?'
+                    + azureSearchService.apiParam                                       // Add the required api-version parameter.
+                ;
+                
+                // generate the filter clause
+                viewModel.filterCount = 0;
+                var filter = '';
+                for (var key in viewModel.filters) {
+                    var item = viewModel.filters[key];
+                    filter = filter + item;
+                    
+                    if (viewModel.filterCount < (viewModel.filters.length - 1)) {
+                        filter = filter + ' and ';
+                    }
+                    viewModel.filterCount = viewModel.filterCount + 1;
+                }
+                
+                // Determine which facets to request
+                var facets = ['breweryName', 'abv,interval:4', 'lastTappedOn,interval:month'];
+                if (viewModel.searchIndex === 'breweries') {
+                    facets = ['breweryType'];
+                }
+                
+                var searchParameters = {
+                    search: (query) ? query : '*',
+                    count:true,
+                    queryType: viewModel.queryType,
+                    filter: filter,
+                    facets: facets,
+                    top: viewModel.pageSize,
+                    highlight: 'name',
+                    highlightPreTag: '<span style="background-color:orange;">',
+                    highlightPostTag: '</span>'
+                };
+
+                if (viewModel.orderBy !== 'score') {
+                    searchParameters.orderby = viewModel.orderBy;
+                }
+                
+                viewModel.currentPage = (skipToPage) ? skipToPage : 1;
+                if (skipToPage > 1) {
+                    searchParameters.skip = (skipToPage-1) * viewModel.pageSize;          
+                }
+
+                // Find the matching documents
+                viewModel.searchStartedAt = new Date().getTime();
+                $.ajax({
+                    type: 'POST', url: searchUrl, cache: 'false',
+                    contentType:'application/json',
+                    headers: azureSearchService.headers,
+                    data: JSON.stringify(searchParameters),
+                    success: onSearchSuccess,
+                    error: onSearchFailure,
+                    complete: onSearchComplete
+                });                
+            }
+                                                
+            /**
+             * This function converts degrees to radians.
+             */
+            function convertDegreesToRadians(degrees) {
+                return degrees * (Math.PI/180);
+            }
+            
+            function resetButtonClick() {
+                var isConfirmed = confirm('This will reset the "growler" search service to its original state.\nThis means all data modifications will be lost.\nOther individuals may be impacts.\nAre you sure you want to reset the "growler" search service?');
+                if (isConfirmed) {
+                    alert("delete");
+                }
+                return false;
+            }
+            
+            /**
+             * Calculates the distance between two geographical points.
+             * The calculation is made using the Haversine formula.
+             */
+            function calculateDistance(point1, point2) {
+                var distance = 'unknown';
+                if ((point1) && (point2)) {
+                    var destination = point2.coordinates;                    
+                    var latDiff = convertDegreesToRadians(destination[1]-point1.latitude); 
+                    var lonDiff = convertDegreesToRadians(destination[0]-point1.longitude); 
+  
+                    var a = Math.sin(latDiff/2) * Math.sin(latDiff/2) +
+                        Math.cos(convertDegreesToRadians(point1.latitude)) * Math.cos(convertDegreesToRadians(destination[1])) * 
+                        Math.sin(lonDiff/2) * Math.sin(lonDiff/2);                    
+                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+
+                    var distanceInKm = 6371 * c;                    // 6371 is the radius of the Earth in kilometers. Remember: Distances in Azure Search are in Kilometers
+                    var distanceInMi = distanceInKm * 0.621371;
+                    distance = distanceInMi.toFixed(1) + ' mi. or ' + distanceInKm.toFixed(1) + ' km.';               
+                }
+                return distance;
+            }
+
+            /**
+             * This function prints out the response to a request error. 
+             * As this app is for learning, it's primarily for educational purposes.
+             */            
+            function logRequestError(xhr, status, err) {
+                console.log('status:');
+                console.log(status);
+                    
+                console.log('err:');
+                console.log(err);
+                    
+                console.log('XmlHttpRequest:');
+                console.log(xhr);                
+            }
+            
+            /**
+             * This function is used to show/hide the warning icon.
+             * In addition, it will display a warning message if the user hovers over it.
+             */
+            function toggleWarning(msg, show) {
+                var warningIcon = document.getElementById('warningIcon');
+                if (warningIcon) {
+                    warningIcon.style.display = (show) ? 'initial' : 'none';                    
+                    $('#warningIcon')
+                        .tooltip('hide')
+                        .attr('data-original-title', msg)
+                        .tooltip('fixTitle')
+                    ;
+                }
+            }
+                        
+            function onPositionObtained(position) {
+                viewModel.location = position.coords;
+            }
+            
+            function onPositionError(error) {
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        toggleWarning('You denied the request for Geolocation. Growler will not be able to correctly perform geospatial searches.', true);
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);
+                        break;
+                    case error.TIMEOUT:
+                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);                    
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        toggleWarning('An unknown error happened getting your location. Growler will not be able to correctly perform geospatial searches.', true);                                        
+                        break;
+                }
+            }
+            
+            /** 
+             * This function loads the breweries that are available in our Growler search service. 
+             */
+            function loadBreweries() {
+                var breweryOptionList = document.getElementById("beerBrewery");
+                if (breweryOptionList) {
+                    // Clear out the existing brewery options                    
+                    for (var i = (breweryOptionList.length-1); i >= 0; i--) {
+                        breweryOptionList.remove(i);
+                    }                    
+    
+                    // Load the breweries from the "breweries" search index in Azure Search.                
+                    var searchUrl = azureSearchService.url + '/breweries/docs/search?' + azureSearchService.apiParam;
+                    $.ajax({ 
+                        type: 'POST', url: searchUrl, cache: 'false',
+                        contentType:'application/json',
+                        headers: azureSearchService.headers,
+                        data: JSON.stringify({
+                            select: 'id,name,location',
+                            orderby: 'name'
+                        }),
+                        success: function(breweryIndex) {                        
+                            if (breweryIndex.value) {
+                                for (var item in breweryIndex.value) {
+                                    var brewery = breweryIndex.value[item];
+                                    var breweryOption = new Option(brewery.name, brewery.id);
+                                    breweryOptionList.add(breweryOption);
+
+                                    if (brewery.location) {
+                                        if (brewery.location.coordinates) {
+                                            breweryOption.setAttribute('latitude', brewery.location.coordinates[1]);
+                                            breweryOption.setAttribute('longitude', brewery.location.coordinates[0]);
+                                        }
+                                    }                                    
+                                }
+                            }
+                        },
+                        error: function(xhr, status, err) {
+                            logRequestError(xhr, status, err);
+                        },
+                    });                
+                }                
+            }
+            
+            function showInfo() {
+                $('#infoModal').modal('show');
+            }
+            
+            /**
+             * Initialize the search experience when the DOM is fully loaded.
+             */
+            $(function() {
+                // Prepare to get suggestions from Azure Search via Typeahead.js
+                var suggestionEngine = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: {
+                        url: azureSearchService.url + '/' + viewModel.searchIndex + '/docs/suggest?' + azureSearchService.apiParam,
+                        prepare: function (query, settings) {
+                            settings.type = 'POST';
+                            settings.contentType = 'application/json; charset=UTF-8';
+                            settings.headers = { 'api-key':azureSearchService.apiKey };
+
+                            settings.data = JSON.stringify({ 
+                                search: query,
+                                suggesterName: 'beerSuggestions',
+                                top: 3,
+                                select: 'name,breweryName,abv,ibu'                          
+                            });
+                            return settings;
+                        },
+                        transform: function(res) {
+                            return res.value;
+                        }
+                    }
+                });
+                $('#queryField').typeahead(null, {
+                    minLength: 3,
+                    name: 'suggestions',
+                    source: suggestionEngine,
+                    display: 'name',
+                    templates: {
+                        suggestion: function(data) {
+                            return '<p><strong>' + data.name + '</strong><br /><i>' + data.breweryName + '</i><br />abv: ' + data.abv + ' ibu: ' + data.ibu + '</p>';
+                        }
+                    }
+                });
+                loadBreweries();
+                
+                // Attempt to get the user's location for the purpose of calculating the distance to the results
+                toggleWarning('', false);
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(onPositionObtained, onPositionError);                    
+                } else {
+                    toggleWarning('Your browser does not have support for geolocation.', true);                    
+                }
+
+                // Setup the last tapped on date picker.
+                $('#beerLastTappedOn').datetimepicker({ 
+                    useCurrent: false,
+                    showTodayButton: true,
+                    showClear: true
+                });
+                
+                $('#beersSearchIndex').click(function() { 
+                    viewModel.searchIndex = 'beers'; 
+                    $('#searchIndexButton').text('Beers');
+                });
+
+                $('#breweriesSearchIndex').click(function() { 
+                    viewModel.searchIndex = 'breweries'; 
+                    $('#searchIndexButton').text('Breweries');
+                });
+                
+                $('#powerSyntaxCheckBox').change(function() {
+                    viewModel.queryType = (this.checked) ? 'full' : 'simple';
+                });
+                
+                $('#addNewBreweryLink').click(onAddNewBreweryButtonClick);
+                $('#saveBreweryButton').click(onSaveBreweryButtonClick);                
+                
+                $('#addNewBeerLink').click(onAddNewBeerButtonClick);
+                $('#saveBeerButton').click(onSaveBeerButtonClick);
+                                
+                $('#sortChoice').change(function() { 
+                    viewModel.orderBy = $(this).val();
+                    executeSearch(viewModel.currentPage);
+                });
+                                
+                $('#applyFilterButton').click(function() {
+                    var ibus = $('#ibuField').val();
+                    if (ibus) {
+                        viewModel.filters['ibu'] = '(ibu lt ' + ibus + ')';                        
+                    }
+                                        
+                    executeSearch(1);
+                    return false;
+                });
+                
+                $('#searchButton').click(function() {
+                    executeNewSearch();                    
+                });
+                $('[data-toggle="tooltip"]').tooltip();
+                $('#clearFiltersButton').click(clearFilters);   
+                
+                $('#resetButton').click(resetButtonClick);                
+                
+                // Detect if the user clicks the "enter" or "return" key.
+                $('#queryField').keypress(function(e) {
+                    if  (e.which === 13) {
+                        executeNewSearch();                        
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

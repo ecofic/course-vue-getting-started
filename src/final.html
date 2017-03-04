@@ -1,0 +1,648 @@
+<!--
+    This sample code is intended to be used for inspiration.
+    It is not 100% bullet proof. 
+    If you use this code, you're responsible for testing it.
+-->
+<html>
+    <head>
+        <title>Growler</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" href="http://rawgit.com/bassjobsen/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" rel="stylesheet" media="screen">
+        
+        <style>
+            .headers {
+                font-family: 'Verdana';
+                margin: 0;
+                padding: 0;         
+                color: 'yellow';
+            }
+
+            .accent-color {
+                color:#FF6A00;
+            }
+
+            .add-button {
+                position:relative;
+                top: -6px;
+            }
+            .result-logo {
+                font-size:42px;
+                padding-top:8px;
+            }
+            
+            .rating-star {
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+            
+            .help {
+                padding-left:8px;
+            }  
+        </style>
+    </head>
+    <body>        
+        <div id="growler">
+            <div class="container">
+                <div class="row" style="padding:1rem 0rem 0rem;">
+                    <div class="col-lg-3">
+                        <ul class="list-inline">
+                            <li><img alt="Growler" v-bind:src="appLogo" style="height:36px;" /></li>                            
+                            <li><h2 v-text="appName" v-bind:class="{'headers': true, 'accent-color': isOnline}"></h2></li>
+                            <li><i class="fa fa-info-circle" style="font-size:24px; cursor:pointer;" onclick="showInfo();"></i></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-lg-5">
+                        <!-- The search field -->
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input v-model.trim="query" type="search" class="form-control" placeholder="please enter your query here.">
+                                    <div class="input-group-btn" data-toggle="tooltip" data-placement="right" title="This field toggles between which search index the query will be executed against.">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="searchIndexButton">Beers</span> <span class="caret"></span></button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li><a id="beersSearchIndex" href="#">Beers</a></li>
+                                            <li><a id="breweriesSearchIndex" href="#">Breweries</a></li>
+                                        </ul>
+                                    </div>
+                                </div>                            
+                            </div>
+                        </form>                    
+                    </div>
+                
+                    <div class="col-lg-2">
+                        <button id="searchButton" type="button" class="btn btn-primary" v-on:click="executeNewSearch">Search</button>
+                        <i id="warningIcon" class="fa fa-warning" data-toggle="tooltip" data-placement="bottom" title="" style="font-size:18px; position:relative; top:4px; left:8px"></i>
+                    </div>
+                
+                    <div class="col-lg-2" style="padding-left:0px;">
+                        <div class="btn-group add-button" data-toggle="tooltip" data-placement="left" title="This button will let you add a document to either the 'beers' or 'breweries' search index.">
+                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-plus"></span> <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a id="addNewBeerLink" href="#">Beer</a></li>
+                                <li><a id="addNewBreweryLink" href="#">Brewery</a></li>
+                            </ul>
+                        </div>                        
+                    </div>
+                </div>
+                <div>{{ query }}</div>
+                <hr style="margin-top:0px;" />
+            
+                <!-- Display the facets and the results -->
+                <div id="noResultUI" class="row">
+                    <!-- This is intentionally blank. This is just a placeholder until a query is executed. -->
+                </div>
+            
+                <div id="resultUI" class="row" style="display:none;">
+                    <div class="col-lg-8">
+                        <!-- Search results -->
+                        <div class="row"><div id="searchResults" class="col-lg-12"></div></div>                                            
+                        
+                        <!-- Pager -->
+                        <div class="row">
+                            <div class="col-lg-2"></div>
+                            <div class="col-lg-10">
+                                <nav>
+                                    <ul id="resultsPager" class="pagination">
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>                    
+                    </div>
+                
+                    <div class="col-lg-offset-1 col-lg-3 pull-right">
+                        <form action="#">                        
+                            <div class="form-group">
+                                <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration.">Query Duration</label>
+                                <p><span id="queryDuration"></span></p>
+                            </div>
+                        
+                            <div class="form-group">
+                                <label data-toggle="tooltip" data-placement="left" title="This demonstrates the 'count' parameter.">Query Results</label>
+                                <p><span id="queryResultCount"></span></p>
+                            </div>           
+                        
+                            <div class="form-group">
+                                <label data-toggle="tooltip">Disclaimer</label>
+                                <p>
+                                    The data in this search service is fictional.
+                                    It is not intended to be used for real beers.
+                                    <br /><br />
+                                    The data in this search service is in a shared environment.
+                                    There may be other individuals modifying the data while you're using it.                                
+                                    Please be aware that you may experience unexpected results because of this.
+                                    <br /><br />
+                                    You can reset the data to its original state by clicking the button below.
+                                    <br /><br />
+                                    <button id="resetButton" class="btn btn-danger" data-toggle="tooltip" data-placement="left" title="This will reset growler to its original state.">Reset Data</button>
+                                </p>
+                            </div>                        
+                        </form>                    
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Beer Dialog -->
+            <div id="beerModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Beer</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="beerName">Name</label>
+                                            <input type="text" class="form-control" id="beerName" placeholder="">
+                                        </div>
+                                    </div>
+                                
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="beerBrewery">Brewery</label>
+                                            <select id="beerBrewery" class="form-control"></select>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            
+                                <hr />
+                            
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="beerIsActivelyBrewed">Actively Brewed?</label><br />
+                                            <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedYes" value="true" checked> Yes</label>
+                                            <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedNo" value="false"> No</label>
+                                        </div>
+                                    
+                                        <div class="form-group">
+                                            <label for="beerLastTappedOn">Last Tapped On</label>
+                                            <div class='input-group date' id='beerLastTappedOn'>                                        
+                                                <input type="text" class="form-control" id="beerLastTappedOnDate">
+                                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="form-group">
+                                            <label for="beerIbu">IBU (International Bitterness Units)</label>
+                                            <input type="text" class="form-control" id="beerIbu" placeholder="i.e. 60">
+                                        </div>
+                                    
+                                        <div class="form-group">
+                                            <label for="beerAbv">ABV (Alchohol by Volume)</label>
+                                            <input type="text" class="form-control" id="beerAbv" placeholder="i.e. 5.4">
+                                        </div>                                    
+                                    </div>
+                                    
+                                    <div class="col-sm-6">
+                                        <label for="flavors">Flavors</label>
+                                        <div class="panel panel-default"  style="height:244px; overflow-y:scroll;">
+                                            <div class="panel-body" style="padding-top:0px; padding-bottom:0px;">
+                                                <div class="checkbox"><label><input id="beerBananaFlavor" type="checkbox" value="">Banana</label></div>
+                                                <div class="checkbox"><label><input id="beerBiscuityFlavor" type="checkbox" value="">Biscuity</label></div>
+                                                <div class="checkbox"><label><input id="beerBourbonFlavor" type="checkbox" value="">Bourbon</label></div>
+                                                <div class="checkbox"><label><input id="beerBreadFlavor" type="checkbox" value="">Bread</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerButterFlavor" type="checkbox" value="">Butter</label></div>
+                                                <div class="checkbox"><label><input id="beerCaramelFlavor" type="checkbox" value="">Caramel</label></div>
+                                                <div class="checkbox"><label><input id="beerCitrusFlavor" type="checkbox" value="">Citrus</label></div>
+                                                <div class="checkbox"><label><input id="beerChocolateFlavor" type="checkbox" value="">Chocolate</label></div>
+                                                <div class="checkbox"><label><input id="beerCoffeeFlavor" type="checkbox" value="">Coffee</label></div>
+                                                <div class="checkbox"><label><input id="beerDriedFruitFlavor" type="checkbox" value="">Dried Fruit</label></div>
+                                                <div class="checkbox"><label><input id="beerFloralFlavor" type="checkbox" value="">Floral</label></div>
+                                                <div class="checkbox"><label><input id="beerFruitFlavor" type="checkbox" value="">Fruit</label></div>
+                                                <div class="checkbox"><label><input id="beerGrapefruitFlavor" type="checkbox" value="">Grapefruit</label></div>
+                                                <div class="checkbox"><label><input id="beerGrassFlavor" type="checkbox" value="">Grass</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerHoneyFlavor" type="checkbox" value="">Honey</label></div>
+                                                <div class="checkbox"><label><input id="beerHopsFlavor" type="checkbox" value="">Hops</label></div>
+                                                <div class="checkbox"><label><input id="beerLicoriceFlavor" type="checkbox" value="">Licorice</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerMaltFlavor" type="checkbox" value="">Malt</label></div>
+                                                <div class="checkbox"><label><input id="beerOrangeFlavor" type="checkbox" value="">Orange</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerPineFlavor" type="checkbox" value="">Pine</label></div>
+                                                <div class="checkbox"><label><input id="beerPumpkinFlavor" type="checkbox" value="">Pumpkin</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerRaisinFlavor" type="checkbox" value="">Raisin</label></div>
+                                                <div class="checkbox"><label><input id="beerSausageFlavor" type="checkbox" value="">Sausage</label></div>
+                                                <div class="checkbox"><label><input id="beerSmokeFlavor" type="checkbox" value="">Smoke</label></div>
+                                                <div class="checkbox"><label><input id="beerTangerineFlavor" type="checkbox" value="">Tangerine</label></div>
+                                                <div class="checkbox"><label><input id="beerVanillaFlavor" type="checkbox" value="">Vanilla</label></div>                                            
+                                                <div class="checkbox"><label><input id="beerWheatFlavor" type="checkbox" value="">Wheat</label></div>
+                                                <div class="checkbox"><label><input id="beerWoodFlavor" type="checkbox" value="">Wood</label></div>
+                                                <div class="checkbox"><label><input id="beerYeastFlavor" type="checkbox" value="">Yeast</label></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                                        
+                                <hr />
+                            
+                                <div class="form-group">
+                                    <label for="beerDescription">Description</label>
+                                    <textarea id="beerDescription" class="form-control"></textarea>
+                                </div>                                                      
+                            </form>
+                        </div>
+      
+                        <div class="modal-footer">
+                            <div class="pull-left text-muted">
+                                <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new beer."></span>
+                                <span>Generated Beer ID:</span>
+                                <span id="beerId"></span>
+                            </div>                        
+                        
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button id="saveBeerButton" type="button" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Beer Result Dialog -->
+            <div id="beerResultModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Beer</h4>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#beerResultInfo">Info</a></li>
+                                <li><a data-toggle="tab" href="#beerResultFlavors">Flavors</a></li>                            
+                                <li><a data-toggle="tab" href="#beerResultBrewery">Brewery</a></li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div id="beerResultInfo" class="tab-pane fade in active">
+                                    <div style="padding:12px;">
+                                        <div class="row">
+                                            <div class="col-xs-8">
+                                                <div class="form-group">
+                                                    <label for="beerResultName">Name</label>
+                                                    <p id="beerResultName">[name]</p>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="beerResultDescription">Description</label>
+                                                    <p id="beerResultDescription"></p>
+                                                </div>
+                                            </div>
+                                    
+                                            <div class="col-xs-4">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="beerResultIbu">IBU</label>
+                                                            <p id="beerResultIbu"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="beerResultAbv">ABV</label>
+                                                            <p id="beerResultAbv"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="beerResultStatus">Actively Brewed</label>
+                                                    <p id="beerResultStatus">[status]</p>
+                                                </div>
+                                            
+                                                <div class="form-group">
+                                                    <label for="beerResultLastTappedOn">Last Tapped On</label>
+                                                    <p id="beerResultLastTappedOn">[last tapped on]</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                
+                                </div>
+
+                                <div id="beerResultFlavors" class="tab-pane fade in">
+                                    <div style="padding:12px">
+                                        <div class="form-group">
+                                            <label for="beerResultFlavorList">Flavors</label>
+                                            <p id="beerResultFlavorList"></p>
+                                        </div>                                    
+                                    </div>
+                                </div>
+
+                                <div id="beerResultBrewery" class="tab-pane fade">
+                                    <div style="padding:12px;">
+                                        <div class="form-group">
+                                            <label for="beerResultBreweryName">Name</label>
+                                            <p id="beerResultBreweryName">[name]</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                        
+                        </div>
+      
+                        <div class="modal-footer">
+                            <div class="pull-left text-muted">
+                                <span>Beer ID:</span>
+                                <span id="beerResultId"></span>
+                            </div>                        
+                        
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                       
+            <!-- Brewery Dialog -->
+            <div id="breweryModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Brewery</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div id="breweryErrorAlert" class="alert alert-danger collapse" role="alert">
+                                    <span><i class="fa fa-times-circle"></i>&nbsp;Error:</span>
+                                    <span>There was a problem. Please check the console window for more details.</span>
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="breweryName">Name</label>
+                                    <input type="text" class="form-control" id="breweryName" placeholder="">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="brewerySlogan">Slogan</label>
+                                    <input type="text" class="form-control" id="brewerySlogan" placeholder="something witty goes here">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="breweryDescription">Description</label>
+                                    <textarea id="breweryDescription" class="form-control" rows="3"></textarea>
+                                </div>
+                            
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="breweryType">Type of Brewery</label>
+                                            <select id="breweryType" class="form-control">
+                                                <option value="nano">Nano</option>
+                                                <option value="micro">Micro</option>
+                                                <option value="farm">Farm</option>
+                                                <option value="regional">Regional</option>
+                                                <option value="macro">Macro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="breweryLatitude">Latitude</label>
+                                            <input type="text" class="form-control" id="breweryLatitude">
+                                        </div>
+                                    </div>
+                            
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="breweryLongitude">Longitude</label>
+                                            <input type="text" class="form-control" id="breweryLongitude">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+      
+                        <div class="modal-footer">
+                            <div class="pull-left text-muted">
+                                <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new brewery."></span>                            
+                                <span>Generated Brewery ID:</span>
+                                <span id="breweryId"></span>
+                            </div>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button id="saveBreweryButton" type="button" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Info Dialog -->
+            <div id="infoModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">About</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                A special thanks to those in the open source community.
+                                I'm thankful for the efforts involved in creating the components this app uses.
+                                This app uses the following components and I'm thankful to their contributors.
+                            </p> 
+                        
+                            <table class="table">
+                                <thead>
+                                    <th>Library</th>
+                                    <th>Version</th>
+                                    <th>License</th>
+                                </thead>
+                            
+                                <tbody>
+                                    <tr>
+                                        <td><a href="http://getbootstrap.com/" target="_blank">Bootstrap</a></td>
+                                        <td>3.3.6</td>
+                                        <td><a href="https://github.com/twbs/bootstrap/blob/v3.3.6/LICENSE" target="_blank">MIT</a></td>
+                                    </tr>
+                                    
+                                    <tr>    
+                                        <td><a href="https://eonasdan.github.io/bootstrap-datetimepicker/" target="_blank">Bootstrap Datepicker</a></td>
+                                        <td>4.17.37</td>
+                                        <td><a href="https://github.com/Eonasdan/bootstrap-datetimepicker/blob/v4.14.30/LICENSE" target="_blank">MIT</a></td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><a href="https://jquery.com/" target="_blank">JQuery</a></td>
+                                        <td>1.11.3</td>
+                                        <td><a href="https://github.com/jquery/jquery/blob/1.11.3/MIT-LICENSE.txt" target="_blank">MIT</a></td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><a href="https://twitter.github.io/typeahead.js/" target="_blank">Typeahead</a></td>
+                                        <td>0.11.1</td>
+                                        <td><a href="https://github.com/twitter/typeahead.js/blob/v0.11.1/LICENSE" target="_blank">MIT</a></td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><a href="http://momentjs.com/" target="_blank">Moment.js</a></td>
+                                        <td>2.13.0</td>
+                                        <td><a href="https://github.com/moment/moment/blob/2.13.0/LICENSE" target="_blank">MIT</a></td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><a href="https://github.com/bassjobsen/typeahead.js-bootstrap-css" target="_blank">Typeahead.js-bootstrap-css</a></td>
+                                        <td>1.2.1</td>
+                                        <td><a href="https://github.com/bassjobsen/typeahead.js-bootstrap-css/blob/1.2.1/LICENSE.md" target="_blank">MIT</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+      
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+        </div>
+        
+        <!-- 
+            Google Analytics is included to identify if individuals find the sample useful.
+            This data is used to identify if in-depth examples should be created for future courses.
+        -->
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-78628669-3', 'auto');
+            ga('send', 'pageview');            
+        </script>
+
+        <!-- Import External Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script src="https://twitter.github.io/typeahead.js/releases/0.11.1/typeahead.bundle.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.min.js" type="text/javascript"></script>
+        <script src="https://unpkg.com/vue@2.2.0/dist/vue.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            var growler = new Vue({
+                el: '#growler',
+                data: {
+                    appName: 'Growler',
+                    appLogo: '/public/img/logo.png',
+                    isOnline: true,                    
+                    
+                    query: '',
+                    searchIndex:'beers',
+                    searchStartedAt:null,                     
+                    
+                    currentPage:1, 
+                    pageSize:7,
+
+                    // These are the details used interact with the Azure Search Service behind this app.
+                    searchService: {
+                        url: 'https://ecofic-growler-dev.search.windows.net/indexes',
+                        apiParam: 'api-version=2015-02-28',
+                        apiKey: 'D71CECC93600E296532BDA6DAECD1687',
+                        headers: {
+                            'api-key':'D71CECC93600E296532BDA6DAECD1687',
+                            'Content-Type':'application/json'
+                        }
+                    },
+
+                    // These are the details used to interact with this app.
+                    appService: {
+                        url: 'http://ecofic.com/about/publications/courses/adding-search-abilities-to-your-apps-with-azure-search/add',                
+                        headers: {
+                            'api-key':'D71CECC93600E296532BDA6DAECD1687',
+                            'Content-Type':'application/json'                    
+                        }
+                    },                    
+
+                    currentLocation: null,
+                    locationWarning: ''
+                },
+                watch: {
+                    query: function(newQuery) {
+                        console.log('was: "' + this.query + '" now: "' + newQuery + '"');
+                    }
+                },
+                created: function() {
+                    if (navigator.geolocation) {
+                        var self = this;
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) { 
+                                self.currentLocation = position.coords;
+                            }, 
+                            function(error) { 
+                                alert('position unknown');
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+//                                        toggleWarning('You denied the request for Geolocation. Growler will not be able to correctly perform geospatial searches.', true);
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+//                                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);
+                                        break;
+                                    case error.TIMEOUT:
+//                                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);                    
+                                        break;
+                                    case error.UNKNOWN_ERROR:
+//                                        toggleWarning('An unknown error happened getting your location. Growler will not be able to correctly perform geospatial searches.', true);                                        
+                                        break;
+                                }
+                            }
+                        );
+                    } else {
+//                        toggleWarning('Your browser does not have support for geolocation.', true);                    
+                    }                    
+                },
+
+                methods: {
+                    /**
+                     * Reacts to the user clicking the "search" button.
+                     */                    
+                    executeNewSearch: function(event) {
+                        console.log(this.searchService);
+                        this.executeSearch(1);
+                    },
+
+                    /**
+                     * Executes a search.
+                     */
+                    executeSearch: function(skipToPage) {
+                        var searchUrl = 
+                            this.searchService.url + '/' 
+                            + this.searchIndex + '/docs/search?'
+                            + this.searchService.apiParam
+                        ;
+
+                        var searchParameters = {
+                            search: (this.query) ? this.query : '*',
+                            count:true,
+                            queryType: this.queryType,
+                            top: this.pageSize,
+                        };
+
+                        this.currentPage = (skipToPage) ? skipToPage : 1;
+                        if (skipToPage > 1) {
+                            searchParameters.skip = (skipToPage-1) * this.pageSize;          
+                        }
+                        
+                        this.searchStartedAt = new Date().getTime();
+                        axios.post(searchUrl, searchParameters)
+                            .then(function (response) {
+                                alert('yeah!');
+                                console.log(response);
+                            })
+                            .catch(function (error) {
+                                alert('oops');
+                                console.log(error);
+                            })
+                        ;
+                    }
+                }
+            });            
+        </script>
+    </body>
+</html>

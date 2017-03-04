@@ -1,0 +1,29 @@
+{
+  "name": "Growler",
+  "description": "Growler UI associated with the Getting Started with Vue.js Pluralsight course.",
+  "version": "0.0.0",
+  "homepage": "http://www.ecofic.com/courses/getting-started-with-vuejs",
+  "main": "src/",
+  "keywords": [
+    "growler",
+    "vue",
+    "ecofic"
+  ],
+  "license": "MIT",
+  "repository": {},
+  "author": {
+    "name": "Chad Campbell"
+  },
+  "contributors": [],
+  "engines": {
+    "node": ">= 0.12.0"
+  },
+  "scripts": {
+    "windows": "cd ./src/ & lite-server",
+    "linux":   "cd ./src/ ; lite-server"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "lite-server": "^2.2.2"
+  }
+}
