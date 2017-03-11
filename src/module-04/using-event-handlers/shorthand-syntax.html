@@ -13,13 +13,13 @@
             <div id="growler">            
                 <form class="form-horizontal">
                     <p>
-                        [Explanation goes here]
+                        This example shows the <code>v-on</code> shorthand syntax (<code>@</code>) in use.
                     </p>
 
                     <div class="form-group">
                         <div class="input-group">
                             <input v-model.trim="query" type="search" class="form-control" placeholder="please enter your query here.">
-                            <button v-on:click="executeNewSearch('hi')" type="button" class="btn btn-primary">Search</button>                            
+                            <button @click="executeNewSearch" type="button" class="btn btn-primary">Search</button>                            
                         </div>
                     </div>
                 </form>
@@ -54,15 +54,11 @@
                 },
 
                 methods: {
-                    executeNewSearch: function(msg) {
-                        console.log('method: ' + msg);
+                    executeNewSearch: function() {
+                        alert(this.query);
                     }
                 }
-            });
-
-            growler.$on('executeNewSearch', function(msg) {
-                console.log('on: ' + message);
-            });
+            });        
         </script>
     </body>
 </html>
