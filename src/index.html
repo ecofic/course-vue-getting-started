@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="/public/css/app.css">
     </head>
 
     <body>
@@ -110,7 +111,7 @@
 
                             <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
                                 <div class="card-block">
-                                    <strong>Using Event Handlers</strong>
+                                    <h4>Using Event Handlers</h4>
                                     <ul>
                                         <li><a href="/module-04/using-event-handlers/handling-events-with-methods.html">Handling Events</a></li>                                
                                         <li><a href="/module-04/using-event-handlers/handling-events-inline.html">Handling Events Inline</a></li>
@@ -118,13 +119,40 @@
                                         <li><a href="/module-04/using-event-handlers/shorthand-syntax.html">Shorthand Syntax</a></li>
                                     </ul>
 
-                                    <strong>Targeting Events</strong>
+                                    <h4>Altering Events</h4>
+                                    <h5>Understanding Event Propagation</h5>
                                     <ul>
-                                        <li><a href="/module-04/targeting-events/example-01.html">Demo</a></li>
-                                        <li><a href="/module-04/targeting-events/using-the-capture-modifier.html">Using the Capture Modifier</a></li>
-                                        <li><a href="/module-04/targeting-events/mixing-capturing-and-bubbling.html">Mixing Capturing and Bubbling</a></li>
-                                        <li><a href="/module-04/targeting-events/using-the-stop-modifier.html">Using the Stop Modifier</a></li>
-                                        <li><a href="/module-04/targeting-events/using-the-stop-modifier-on-ancestor.html">Using the Stop Modifier on an Ancestor</a></li>                                
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/example-01.html">Demo</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-capture-modifier.html">Using the Capture Modifier</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/mixing-capturing-and-bubbling.html">Mixing Capturing and Bubbling</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-prevent-modifier.html">Using the Prevent Modifier</a></li>                                        
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-prevent-modifier-on-ancestor.html">Using the Prevent Modifier on an Ancestor</a></li>                                                                                
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-stop-modifier.html">Using the Stop Modifier</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-stop-modifier-on-ancestor.html">Using the Stop Modifier on an Ancestor</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-self-modifier.html">Using the Self Modifier</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-self-modifier-on-ancestor.html">Using the Self Modifier on an Ancestor</a></li>
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-once-modifier.html">Using the Once Modifier</a></li>                                        
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/using-the-once-modifier-propagation.html">Once Modifier Event Propagation</a></li>                                                                                
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/comparing-event-modifiers.html">Comparing Event Modifiers</a></li>                                        
+                                        <li><a href="/module-04/altering-events/understanding-event-propagation/chaining-modifiers-together.html">Chaining Event Modifiers Together</a></li>                                        
+                                    </ul>
+
+                                    <h5>Reacting to Keyed Events</h5>
+                                    <ul>
+                                        <li><a href="/module-04/altering-events/reacting-to-keyed-events/example-01.html">Demo</a></li>
+                                        <li><a href="/module-04/altering-events/reacting-to-keyed-events/example-02.html">Using the <code>enter</code> modifier</a></li>                                        
+                                        <li><a href="/module-04/altering-events/reacting-to-keyed-events/custom-modifier.html">Using Custom Modifiers</a></li>                                        
+                                    </ul>
+
+                                    <h5>Reacting to Mouse Events</h5>
+                                    <ul>
+                                        <li><a href="/module-04/altering-events/reacting-to-mouse-events/example-01.html">Demo</a></li>
+                                        <li><a href="/module-04/altering-events/reacting-to-mouse-events/example-02.html">Demo</a></li>                                        
+                                    </ul>
+
+                                    <h5>Reacting to Special Keys</h5>
+                                    <ul>
+                                        <li><a href="/module-04/altering-events/reacting-to-special-keys/example-01.html">Demo</a></li>                                        
                                     </ul>
                                 </div>
                             </div>
@@ -167,7 +195,7 @@
                 <div class="col-xs-12 col-lg-4">
                     <h5>About these Examples</h5>
                     <p>
-                        These examples complement the <a href="" target="_blank">Vue.js: Getting Started</a> training course.
+                        These examples complement the <a href="https://www.ecofic.com/courses/vue-getting-started" target="_blank">Vue.js: Getting Started</a> training course.
                         For that reason, the examples are explained within the course itself.
                     </p>
 
@@ -180,6 +208,12 @@
                 </div>
             </div>
         </div>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">These examples complement the <a href="https://www.ecofic.com/courses/vue-getting-started" target="_blank">Vue.js: Getting Started</a> training course.</span>
+            </div>
+        </footer>
 
         <!-- 
             Google Analytics is included to identify if individuals find the sample useful.

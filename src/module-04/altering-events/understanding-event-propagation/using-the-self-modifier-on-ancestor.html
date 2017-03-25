@@ -13,11 +13,11 @@
             <div id="growler">            
                 <form class="form-horizontal">
                     <p>
-                        This example is intended to be used to demonstrate event propagation.
+                        This example demonstrates the <code>stop</code> modifier applied on an ancestor.
                     </p>
 
-                    <div v-on:click="buttonGrandparentClick">
-                        <div class="form-group" v-on:click="buttonParentClick">
+                    <div v-on:click="grandparentClick" style="background-color:#909090; padding:3rem;">
+                        <div class="form-group" v-on:click.self="parentClick" style="background-color:#D8D8D8; padding:3rem;">
                             <button v-on:click="executeSearch" type="button" class="btn btn-primary">Search</button>
                         </div>
                     </div>
@@ -25,8 +25,8 @@
                     <br />
                     <div class="form-group">
                         <label for="logTextarea">Event Log</label>
-                        <textarea class="form-control" v-model="history" rows="15"></textarea>
-                    </div>                    
+                        <textarea class="form-control" v-model="history" rows="4"></textarea>
+                    </div>
                 </form>
             </div>
         </div>
@@ -60,15 +60,15 @@
                 },
 
                 methods: {
-                    executeNewSearch: function() {
-                        this.history += 'Search button clicked. Query "' + this.query + '" was entered.\n';
+                    executeSearch: function() {
+                        this.history += 'Search button clicked.\n';
                     },
 
-                    buttonParentClick: function() {
+                    parentClick: function() {
                         this.history += 'Search button parent clicked.\n';
                     },
 
-                    buttonGrandparentClick: function() {
+                    grandparentClick: function() {
                         this.history += 'Search button grandparent clicked.\n';
                     }
                 }

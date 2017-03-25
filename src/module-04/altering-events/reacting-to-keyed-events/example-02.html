@@ -11,20 +11,19 @@
         <div class="container">
             <br />
             <div id="growler">            
-                <form class="form-horizontal">
+                <form class="form-horizontal" v-on:submit.prevent action="/module-04/altering-events/reacting-to-keyed-events/example-02.html" method="GET">
                     <p>
-                        This example is intended to be used to demonstrate event propagation.
+                        This example demonstrates handling the "enter" key press via the <code>enter</code> modifier.
                     </p>
 
-                    <div v-on:click="buttonGrandparentClick">
-                        <div class="form-group" v-on:click="buttonParentClick">
-                            <button v-on:click="executeSearch" type="button" class="btn btn-primary">Search</button>
-                        </div>
+                    <div class="form-group">
+                        <input class="form-control" type="search" v-model="query" v-on:keyup="evaluateKey" v-on:keyup.enter="executeSearch" autofocus />
+                        <button type="button" v-on:click.once="executeSearch" class="btn btn-primary">Search</button>                        
                     </div>
 
                     <br />
                     <div class="form-group">
-                        <label for="logTextarea">Event Log</label>
+                        <label for="logTextarea">Event Log (<a href="#" v-on:click="clearHistory">clear</a>)</label>
                         <textarea class="form-control" v-model="history" rows="15"></textarea>
                     </div>                    
                 </form>
@@ -60,16 +59,20 @@
                 },
 
                 methods: {
-                    executeNewSearch: function() {
-                        this.history += 'Search button clicked. Query "' + this.query + '" was entered.\n';
+                    evaluateKey: function(e) {
+                        var code = (e.keyCode ? e.keyCode : e.which);                        
+                        this.history += 'key clicked: "' + e.key + '" (' + code + ')\n';
                     },
 
-                    buttonParentClick: function() {
-                        this.history += 'Search button parent clicked.\n';
+                    executeSearch: function(e) {
+                        if (this.query) {
+                            this.history += 'Search button clicked. Query "' + this.query + '" was entered.\n';
+                            //document.forms[0].submit();
+                        }
                     },
 
-                    buttonGrandparentClick: function() {
-                        this.history += 'Search button grandparent clicked.\n';
+                    clearHistory: function() {
+                        this.history = '';
                     }
                 }
             });        

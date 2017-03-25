@@ -1,0 +1,62 @@
+/**
+ * These colors are from Pluralsight's branding (https://www.pluralsight.com/).
+ * This contents of this repo are associated with a Pluralsight course.
+ * That's the reason these themes were created.
+**/
+
+.white {
+  color: #fff;
+}
+
+.white-bg {
+  background-color: #fff;
+}
+
+.blue {
+  color: #2A9FBC;
+}
+
+.blue-bg {
+  background-color: #2A9FBC;
+}
+
+.blue-shade-1 {
+    color: #D1EDF4;
+}
+
+.blue-bg-shade-1 {
+    background-color: #D1EDF4;
+}
+
+.blue-shade-2 {
+    color: #A3DCEA;
+}
+
+.blue-bg-shade-2 {
+    background-color: #A3DCEA;
+}
+
+.blue-shade-3 {
+    color: #75CBE0;
+}
+
+.blue-bg-shade-3 {
+    background-color: #75CBE0;
+}
+
+.blue-shade-4 {
+    color: #1F778C;    
+}
+
+.blue-bg-shade-4 {
+    background-color: #1F778C;
+}
+
+.blue-shade-5 {
+    color: #154F5D;
+}
+
+.blue-bg-shade-5 {
+    background-color: #154F5D;
+}
+
