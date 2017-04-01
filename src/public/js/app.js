@@ -77,7 +77,7 @@ function showAppMessage(visits) {
 
         if (alertBody) {
             var message = '<div class="alert ' + alertState + '" role="alert">';
-            message += '<h4 class="alert-heading">' + alertHeading + '</h4>'; 
+            message += '<h3 class="alert-heading">' + alertHeading + '</h3>'; 
             message += alertBody;
             message += '</div>';
 

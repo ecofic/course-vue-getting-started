@@ -29,33 +29,12 @@
                     <div class="form-group row">
                         <div class="col-12">
                             <div class="event-block text-center" style="border-color:green;" v-on:click="onAnyClick">
-                                Click in this area with any mouse button.
+                                Right click in this area with any mouse button.
                             </div>
                         </div>                        
                     </div>
                     <br />                    
 
-                    <div class="form-group row">
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.left="leftBlockClick">
-                                Click in this area with the left mouse button.
-                            </div>
-                        </div>
-                        
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.middle="middleBlockClick">
-                                Click in this area with the middle mouse button.
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.prevent.right="rightBlockClick">
-                                Click in this area with the right mouse button.
-                            </div>
-                        </div>                        
-                    </div>                        
-
-                    <br />
                     <div class="form-group">
                         <label for="logTextarea">Event Log (<a href="#" v-on:click="clearHistory">clear</a>)</label>
                         <textarea class="form-control" v-model="history" rows="15"></textarea>
@@ -69,7 +48,7 @@
                 <span class="text-muted">These examples complement the <a href="https://www.ecofic.com/courses/vue-getting-started" target="_blank">Vue.js: Getting Started</a> training course.</span>
             </div>
         </footer>
-
+        
         <!-- 
             Google Analytics is included to identify if individuals find the sample useful.
             This data is used to identify if in-depth examples should be created for future courses.
@@ -129,7 +108,6 @@
                             button = 'Right';
                         }
 
-                        console.log(e);
                         this.history += 'Mouse click happened: ' + button + ' button clicked.\n';
                     },
 
