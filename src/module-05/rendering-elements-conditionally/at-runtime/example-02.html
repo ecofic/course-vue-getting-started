@@ -6,14 +6,6 @@
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
         <link rel="stylesheet" href="/public/css/app.css">
-
-        <style type="text/css">
-            .event-block {
-                border-width: 1px;
-                border-style: solid;
-                padding:3rem;
-            }
-        </style>
     </head>
 
     <body>
@@ -23,7 +15,7 @@
             <div id="growler">
                 <form style="width:100%;">
                     <p>
-                        This example shows how to use the <code>v-show</code> directives.
+                        This example shows how to use the <code>if</code>-<code>else</code> directives.
                         Press the search button to generate a random number of search results.
                     </p>
 
@@ -77,9 +69,7 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    beers: [
-
-                    ]
+                    beers: []
                 },
                 methods: {
                     executeSearch: function() {

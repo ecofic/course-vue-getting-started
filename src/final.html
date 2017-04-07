@@ -108,7 +108,10 @@
                             <div class="col-lg-2"></div>
                             <div class="col-lg-10">
                                 <nav>
-                                    <ul id="resultsPager" class="pagination">
+                                    <ul class="pagination">
+                                        <li v-for="page in pageCount" class="page-item">
+                                            <a href="#" v-on:click="executeSearch(page);" class="page-link">{{ page }}</a>
+                                        </li>
                                     </ul>
                                 </nav>
                             </div>
@@ -544,9 +547,9 @@
                     searchService: {
                         url: 'https://ecofic-growler-dev.search.windows.net/indexes',
                         apiParam: 'api-version=2015-02-28',
-                        apiKey: 'D71CECC93600E296532BDA6DAECD1687',
+                        apiKey: 'FAE8127A3ABAC769A752106C3D3A26DE',
                         headers: {
-                            'api-key':'D71CECC93600E296532BDA6DAECD1687',
+                            'api-key':'FAE8127A3ABAC769A752106C3D3A26DE',
                             'Content-Type':'application/json'
                         }
                     },
@@ -624,13 +627,17 @@
                             top: this.pageSize,
                         };
 
+                        var searchConfig = {
+                            headers: this.searchService.headers
+                        };
+
                         this.currentPage = (skipToPage) ? skipToPage : 1;
                         if (skipToPage > 1) {
                             searchParameters.skip = (skipToPage-1) * this.pageSize;          
                         }
                         
                         this.searchStartedAt = new Date().getTime();
-                        axios.post(searchUrl, searchParameters)
+                        axios.post(searchUrl, searchParameters, searchConfig)
                             .then(function (response) {
                                 alert('yeah!');
                                 console.log(response);
