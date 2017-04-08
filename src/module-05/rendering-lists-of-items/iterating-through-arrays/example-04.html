@@ -15,15 +15,15 @@
             <div id="growler">
                 <form style="width:100%;">
                     <p>
-                        This example shows how to use the <code>v-for</code> directive to iterate through an array of values.
+                        This example shows how to use the <code>v-for</code> directive to iterate through an array of objects.
                     </p>
 
                     <nav>
-                        <ul class="pagination">
-                            <li v-for="page in pages" class="page-item">
-                                <a href="#" v-on:click="search(page);" class="page-link">{{ page }}</a>
-                            </li>
-                        </ul>
+                        <div v-for="page in pages">
+                            <b>Page: {{ page.number }}</b>
+                            <div v-for="section in page.sections">{{page.number}}-{{ section }}</div>
+                            <br />
+                        </div>
                     </nav>
                 </form>
             </div>
@@ -59,13 +59,11 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    pages: [1, 2, 3, 4, 5]
-                },
-                methods: {
-                    search: function(pageNumber) {
-                        alert('Loading page number: ' + pageNumber);
-                    }
-                }                
+                    pages: [
+                        { number: 1, url: '?page=1', sections: [ 'A', 'B', 'C' ] },
+                        { number: 2, url: '?page=2', sections: [ 'Y', 'Z' ] }                        
+                    ]
+                }
             });        
         </script>
     </body>
