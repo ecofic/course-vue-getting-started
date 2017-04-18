@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>Growler</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">     
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">           
+    </head>
+
+    <body>
+        <div id="growler">
+            <div class="form-group">
+                <label for="logTextarea">Event Log (<a href="#" v-on:click="clearHistory">clear</a>)</label>
+                <textarea class="form-control" v-model="history" rows="15"></textarea>
+            </div>            
+        </div>
+
+        <script src="https://unpkg.com/vue@2.2.5/dist/vue.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var growler = new Vue({
+                el: '#growler',
+                data: {
+                    history: ''
+                },
+                methods: {
+                    clearHistory: function() {
+                        this.history = '';
+                    }
+                },
+
+                beforeCreate: function() {
+                    this.history += 'beforeCreate\n';
+                },
+
+                created: function() {
+                    this.history += 'created\n';
+                },
+
+                beforeMount: function() {
+                    this.history += 'beforeMount\n';
+                },
+
+                mounted: function() {
+                    this.history += 'mounted\n';
+                },
+
+                beforeUpdate: function() {
+                    this.history += 'before update\n';
+                },
+
+                updated: function() {
+                    this.history += 'updated\n';
+                },
+
+                beforeDestroy: function() {
+                    this.history += 'beforeDestroy\n';
+                },
+
+                destroyed: function() {
+                    this.history += 'afterDestroy\n';
+                }
+            });        
+        </script>
+    </body>
+</html>

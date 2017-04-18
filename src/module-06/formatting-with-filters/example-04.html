@@ -5,30 +5,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="/public/css/app.css">
     </head>
 
     <body>
         <div class="container">
             <br />
-            <div id="growler">            
-                <form class="form-horizontal" onkeypress="return checkForEnter(event);">
+
+            <div id="growler">
+                <form style="width:100%;">
                     <p>
-                        This example demonstrates handling the "enter" key press.
+                        This example shows how a watcher function works
                     </p>
 
-                    <div class="form-group">
-                        <input class="form-control" type="search" v-model="query" v-on:keyup="evaluateKey" autofocus />
-                        <button type="button" v-on:click.once="executeSearch" class="btn btn-primary">Search</button>                        
-                    </div>
-
-                    <br />
-                    <div class="form-group">
-                        <label for="logTextarea">Event Log (<a href="#" v-on:click="clearHistory">clear</a>)</label>
-                        <textarea class="form-control" v-model="history" rows="15"></textarea>
+                    <div v-for="result in results">
+                        <div>{{ result.name }}</div>
+                        <small class="text-muted">{{ result.ibu | convertIBU('--') | removePeriods | toUpperCase }}</small>
                     </div>
                 </form>
             </div>
         </div>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">These examples complement the <a href="https://www.ecofic.com/courses/vue-getting-started" target="_blank">Vue.js: Getting Started</a> training course.</span>
+            </div>
+        </footer>
 
         <!-- 
             Google Analytics is included to identify if individuals find the sample useful.
@@ -49,40 +51,37 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
-        <script src="https://unpkg.com/vue@2.1.10/dist/vue.js" type="text/javascript"></script>
+        <script src="https://unpkg.com/vue@2.2.5/dist/vue.js" type="text/javascript"></script>
         <script type="text/javascript">
-            function checkForEnter(e) {
-                var code = (e.keyCode ? e.keyCode : e.which);
-                if (code == 13) {
-                    growler.executeSearch();
-                    return false;
-                }
-                return true;
-            }
-
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    query: '',
-                    history: ''
+                    results: [
+                        { name: 'Ahool Ale', ibu: '33 i.b.u.' },
+                        { name: 'Agogwe Ale', ibu: null },
+                        { name: 'Aswang Ale', ibu: '31 i.b.u.' }
+                    ]
                 },
-
-                methods: {
-                    evaluateKey: function(e) {
-                        var code = (e.keyCode ? e.keyCode : e.which);                        
-                        this.history += 'key clicked: "' + e.key + '" (' + code + ')\n';
-                    },
-
-                    executeSearch: function(e) {
-                        if (this.query) {
-                            this.history += 'Search button clicked. Query "' + this.query + '" was entered.\n';
+                filters: {
+                    convertIBU: function(value, empty) {
+                        if (!value) {
+                            return empty;
                         }
+
+                        console.log('convertIBU: ' + value);
+                        return value.toString();
                     },
 
-                    clearHistory: function() {
-                        this.history = '';
+                    removePeriods: function(value) {
+                        console.log('removePeriods: ' + value);
+                        return value.replace(/\./g, '');
+                    },
+
+                    toUpperCase: function(value) {
+                        console.log('toUpperCase: ' + value);
+                        return value.toUpperCase();
                     }
-                }
+                }                
             });        
         </script>
     </body>

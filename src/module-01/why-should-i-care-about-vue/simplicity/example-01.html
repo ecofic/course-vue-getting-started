@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <title>Growler</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">     
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">           
+    </head>
+
+    <body>
+        <div id="growler">
+            <br />
+            <div class="container">
+                <div v-for="beer in beers">
+                    <div>
+                        <h5>{{ beer.name }}</h5>
+                        <small style="color:gray">abv: {{ beer.abv }}</small>
+                    </div>
+                </div>                
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/vue@2.2.5/dist/vue.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var growler = new Vue({
+                el: '#growler',
+                data: {
+                    beers: [
+                        { name:'Ahool Ale', abv:5.4 },
+                        { name:'Sigbin Stout', abv:8.1 }
+                    ]
+                }
+            });        
+        </script>
+    </body>
+</html>
