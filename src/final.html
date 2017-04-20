@@ -52,12 +52,12 @@
                     <div class="col-lg-3">
                         <ul class="list-inline">
                             <li><img alt="Growler" v-bind:src="appLogo" style="height:36px;" /></li>                            
-                            <li><h2 v-text="appName" v-bind:class="{'headers': true, 'accent-color': isOnline}"></h2></li>
-                            <li><i class="fa fa-info-circle" style="font-size:24px; cursor:pointer;" onclick="showInfo();"></i></li>
+                            <li><h2 v-text="appName" v-bind:class="{'headers': true, 'accent-color': isOnline}" style="position:relative; top:6px;"></h2></li>
+                            <li><i class="fa fa-info-circle" style="font-size:24px; cursor:pointer; position:relative; top:4px;" onclick="showInfo();"></i></li>
                         </ul>
                     </div>
                     
-                    <div class="col-lg-5">
+                    <div class="col-lg-5" style="padding-top:8px;">
                         <!-- The search field -->
                         <form class="form-horizontal">
                             <div class="form-group">
@@ -75,12 +75,13 @@
                         </form>                    
                     </div>
                 
-                    <div class="col-lg-2">
-                        <button id="searchButton" type="button" class="btn btn-primary" v-on:click="executeNewSearch">Search</button>
-                        <i id="warningIcon" class="fa fa-warning" data-toggle="tooltip" data-placement="bottom" title="" style="font-size:18px; position:relative; top:4px; left:8px"></i>
+                    <div class="col-lg-2" style="padding-top:8px;">
+                        <button id="searchButton" type="button" class="btn btn-primary" v-on:click.prevent="executeNewSearch">Search</button>
+                        <i class="fa fa-warning" v-if="locationWarning.length > 0" data-toggle="tooltip" data-placement="bottom" v-bind:title="locationWarning" style="font-size:18px; position:relative; top:4px; left:8px"></i>
                     </div>
                 
                     <div class="col-lg-2" style="padding-left:0px;">
+                        <!--
                         <div class="btn-group add-button" data-toggle="tooltip" data-placement="left" title="This button will let you add a document to either the 'beers' or 'breweries' search index.">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-plus"></span> <span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-menu-right">
@@ -88,9 +89,9 @@
                                 <li><a id="addNewBreweryLink" href="#">Brewery</a></li>
                             </ul>
                         </div>                        
+                        -->
                     </div>
                 </div>
-                <div>{{ query }}</div>
                 <hr style="margin-top:0px;" />
             
                 <!-- Display the facets and the results -->
@@ -98,17 +99,45 @@
                     <!-- This is intentionally blank. This is just a placeholder until a query is executed. -->
                 </div>
             
-                <div id="resultUI" class="row" style="display:none;">
+                <div id="resultUI" class="row" v-if="results !== null">
                     <div class="col-lg-8">
                         <!-- Search results -->
-                        <div class="row"><div id="searchResults" class="col-lg-12"></div></div>                                            
-                        
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <p v-if="results.value.length === 0">There were no results for the query "{{ query }}". Please try again</p>
+                                <div v-else>
+                                    <div class="row" v-for="beer in results.value">
+                                        <div class="col-lg-2">
+                                            <span class="fa fa-beer result-logo" v-if="searchIndex === 'beers'"></span>
+                                            <span class="fa fa-industry result-logo" v-else-if="searchIndex === 'breweries'"></span>
+                                        </div>
+                                        <div class='col-lg-10'>
+                                            <div v-if="searchIndex === 'beers'">
+                                                <h5 v-on:click="showBeerInfo(beer.id)" style="cursor:pointer;">{{ beer.name }}</h5>
+                                                <p>{{ beer.breweryName }} ({{ beer.breweryLocation | getDistance }})</p>
+                                                <ul class='list-inline text-muted'>
+                                                    <li>ibu: {{ beer.ibu }}</li>
+                                                    <li>abv: {{ beer.abv }}</li>
+                                                    <li>last tapped: [lastTappedOn]</li>
+                                                    <li>score: {{ beer['@search.score'] }}</li>
+                                                </ul>                                                
+                                            </div>
+
+                                            <div v-else-if="searchIndex === 'breweries'">
+                                                [brewery]
+                                            </div>
+                                        </div>
+                                    </div><br />
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Pager -->
                         <div class="row">
                             <div class="col-lg-2"></div>
                             <div class="col-lg-10">
-                                <nav>
-                                    <ul class="pagination">
+                                <nav v-if="pageCount > 1">
+                                    <ul class="pagination">                                        
                                         <li v-for="page in pageCount" class="page-item">
                                             <a href="#" v-on:click="executeSearch(page);" class="page-link">{{ page }}</a>
                                         </li>
@@ -118,16 +147,16 @@
                         </div>                    
                     </div>
                 
-                    <div class="col-lg-offset-1 col-lg-3 pull-right">
+                    <div class="col-lg-offset-1 col-lg-3 pull-right" v-if="results !== null">
                         <form action="#">                        
                             <div class="form-group">
                                 <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration.">Query Duration</label>
-                                <p><span id="queryDuration"></span></p>
+                                <p>{{ queryDuration }}</p>
                             </div>
                         
                             <div class="form-group">
                                 <label data-toggle="tooltip" data-placement="left" title="This demonstrates the 'count' parameter.">Query Results</label>
-                                <p><span id="queryResultCount"></span></p>
+                                <p>{{ resultCount }} {{ searchIndex }}</p>
                             </div>           
                         
                             <div class="form-group">
@@ -142,7 +171,9 @@
                                     <br /><br />
                                     You can reset the data to its original state by clicking the button below.
                                     <br /><br />
+                                    <!--
                                     <button id="resetButton" class="btn btn-danger" data-toggle="tooltip" data-placement="left" title="This will reset growler to its original state.">Reset Data</button>
+                                    -->
                                 </p>
                             </div>                        
                         </form>                    
@@ -526,7 +557,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.min.js" type="text/javascript"></script>
-        <script src="https://unpkg.com/vue@2.2.0/dist/vue.js" type="text/javascript"></script>
+        <script src="https://unpkg.com/vue@2.2.5/dist/vue.js" type="text/javascript"></script>
 
         <script type="text/javascript">
             var growler = new Vue({
@@ -534,14 +565,19 @@
                 data: {
                     appName: 'Growler',
                     appLogo: '/public/img/logo.png',
-                    isOnline: true,                    
+                    isOnline: true, 
                     
                     query: '',
+                    results: null,
+                    resultCount: 0,
+
                     searchIndex:'beers',
-                    searchStartedAt:null,                     
+                    searchStartedAt:null,
+                    searchEndedAt: null,
                     
                     currentPage:1, 
                     pageSize:7,
+                    pageCount: 0,
 
                     // These are the details used interact with the Azure Search Service behind this app.
                     searchService: {
@@ -566,32 +602,55 @@
                     currentLocation: null,
                     locationWarning: ''
                 },
-                watch: {
-                    query: function(newQuery) {
-                        console.log('was: "' + this.query + '" now: "' + newQuery + '"');
+                filters: {
+                    /**
+                     * Calculates the distance between two geographical points.
+                     * The calculation is made using the Haversine formula.
+                    */                
+                    getDistance: function(target) {
+                        var distance = 'unknown';
+                        if ((growler.currentLocation) && (target)) {
+                            var destination = target.coordinates;                    
+                            var latDiff = growler.convertDegreesToRadians(destination[1]-growler.currentLocation.latitude); 
+                            var lonDiff = growler.convertDegreesToRadians(destination[0]-growler.currentLocation.longitude); 
+  
+                            var a = Math.sin(latDiff/2) * Math.sin(latDiff/2) +
+                                Math.cos(growler.convertDegreesToRadians(growler.currentLocation.latitude)) * Math.cos(growler.convertDegreesToRadians(destination[1])) * 
+                                Math.sin(lonDiff/2) * Math.sin(lonDiff/2);                    
+                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+
+                            var distanceInKm = 6371 * c;                    // 6371 is the radius of the Earth in kilometers. Remember: Distances in Azure Search are in Kilometers
+                            var distanceInMi = distanceInKm * 0.621371;
+                            distance = distanceInMi.toFixed(1) + ' mi. or ' + distanceInKm.toFixed(1) + ' km.';               
+                        }
+                        return distance;                        
+                    }
+                },
+                computed: {
+                    queryDuration: function() {
+                        var duration = this.searchEndedAt - this.searchStartedAt;
+                        return duration + ' ms';
                     }
                 },
                 created: function() {
-                    if (navigator.geolocation) {
-                        var self = this;
+                    if (navigator.geolocation) {                        
                         navigator.geolocation.getCurrentPosition(
-                            function(position) { 
-                                self.currentLocation = position.coords;
+                            function(position) {
+                                growler.currentLocation = position.coords;
                             }, 
                             function(error) { 
-                                alert('position unknown');
                                 switch(error.code) {
                                     case error.PERMISSION_DENIED:
-//                                        toggleWarning('You denied the request for Geolocation. Growler will not be able to correctly perform geospatial searches.', true);
+                                        growler.locationWarning = 'You denied the request for Geolocation. Growler will not be able to correctly perform geospatial searches.';
                                         break;
                                     case error.POSITION_UNAVAILABLE:
-//                                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);
+                                        growler.locationWarning = 'Your location could not be determined. Growler will not be able to correctly perform geospatial searches.';
                                         break;
                                     case error.TIMEOUT:
-//                                        toggleWarning('Your location could not be determined. Growler will not be able to correctly perform geospatial searches.', true);                    
+                                        growler.locationWarning = 'Your location could not be determined. Growler will not be able to correctly perform geospatial searches.';
                                         break;
                                     case error.UNKNOWN_ERROR:
-//                                        toggleWarning('An unknown error happened getting your location. Growler will not be able to correctly perform geospatial searches.', true);                                        
+                                        growler.locationWarning = 'An unknown error happened getting your location. Growler will not be able to correctly perform geospatial searches.';
                                         break;
                                 }
                             }
@@ -606,7 +665,6 @@
                      * Reacts to the user clicking the "search" button.
                      */                    
                     executeNewSearch: function(event) {
-                        console.log(this.searchService);
                         this.executeSearch(1);
                     },
 
@@ -639,14 +697,30 @@
                         this.searchStartedAt = new Date().getTime();
                         axios.post(searchUrl, searchParameters, searchConfig)
                             .then(function (response) {
-                                alert('yeah!');
-                                console.log(response);
+                                growler.searchEndedAt = new Date().getTime();                                
+                                growler.results = response.data;                                
+                                growler.resultCount = response.data['@odata.count'];
+
+                                var temp = (growler.resultCount + growler.pageSize - 1) / growler.pageSize;
+                                console.log('resultCount: ' + growler.resultCount + ' pageSize: ' + growler.pageSize + ' temp: ' + temp);
+                                growler.pageCount = Math.floor(temp);
                             })
                             .catch(function (error) {
                                 alert('oops');
                                 console.log(error);
                             })
                         ;
+                    },
+
+                    showBeerInfo: function(beerId) {
+                        alert('show it! ' + beerId);
+                    },
+
+                    /**
+                     * This function converts degrees to radians.
+                    */
+                    convertDegreesToRadians: function(degrees) {
+                        return degrees * (Math.PI/180);
                     }
                 }
             });            
