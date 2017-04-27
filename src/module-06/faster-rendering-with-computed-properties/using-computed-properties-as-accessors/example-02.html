@@ -13,6 +13,8 @@
             <div id="growler">            
                 <p>An example of a computed property.</p>
                 <div>Online? {{ isOnline }}</div>
+
+                <button class="btn btn-primary" v-on:click="isOnline = !canConnect">Toggle</button>
             </div>
         </div>
 
@@ -48,6 +50,10 @@
                     isOnline: {
                         get: function () {
                             return this.canConnect ? 'Yes' : 'No';                            
+                        },
+                        set: function(newValue) {
+                            console.log('was: ' + this.canConnect + ' now:' + newValue);
+                            this.canConnect = newValue;
                         }
                     }
                 },
