@@ -111,7 +111,7 @@
                                             <span class="fa fa-beer result-logo" v-if="searchIndex === 'beers'"></span>
                                             <span class="fa fa-industry result-logo" v-else-if="searchIndex === 'breweries'"></span>
                                         </div>
-                                        <div class='col-lg-10'>
+                                        <div class="col-lg-10">
                                             <div v-if="searchIndex === 'beers'">
                                                 <h5 v-on:click="showBeerInfo(beer.id)" style="cursor:pointer;">{{ beer.name }}</h5>
                                                 <p>{{ beer.breweryName }} ({{ beer.breweryLocation | getDistance }})</p>
@@ -180,123 +180,7 @@
                     </div>
                 </div>
             </div>
-        
-            <!-- Beer Dialog -->
-            <div id="beerModal" class="modal fade" tabindex="-1" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Beer</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="beerName">Name</label>
-                                            <input type="text" class="form-control" id="beerName" placeholder="">
-                                        </div>
-                                    </div>
-                                
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="beerBrewery">Brewery</label>
-                                            <select id="beerBrewery" class="form-control"></select>
-                                        </div>                                    
-                                    </div>
-                                </div>
-                            
-                                <hr />
-                            
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="beerIsActivelyBrewed">Actively Brewed?</label><br />
-                                            <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedYes" value="true" checked> Yes</label>
-                                            <label class="radio-inline"><input type="radio" name="beerIsActivelyBrewed" id="beerIsActivelyBrewedNo" value="false"> No</label>
-                                        </div>
-                                    
-                                        <div class="form-group">
-                                            <label for="beerLastTappedOn">Last Tapped On</label>
-                                            <div class='input-group date' id='beerLastTappedOn'>                                        
-                                                <input type="text" class="form-control" id="beerLastTappedOnDate">
-                                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
-                                            </div>
-                                        </div>
-                                    
-                                        <div class="form-group">
-                                            <label for="beerIbu">IBU (International Bitterness Units)</label>
-                                            <input type="text" class="form-control" id="beerIbu" placeholder="i.e. 60">
-                                        </div>
-                                    
-                                        <div class="form-group">
-                                            <label for="beerAbv">ABV (Alchohol by Volume)</label>
-                                            <input type="text" class="form-control" id="beerAbv" placeholder="i.e. 5.4">
-                                        </div>                                    
-                                    </div>
-                                    
-                                    <div class="col-sm-6">
-                                        <label for="flavors">Flavors</label>
-                                        <div class="panel panel-default"  style="height:244px; overflow-y:scroll;">
-                                            <div class="panel-body" style="padding-top:0px; padding-bottom:0px;">
-                                                <div class="checkbox"><label><input id="beerBananaFlavor" type="checkbox" value="">Banana</label></div>
-                                                <div class="checkbox"><label><input id="beerBiscuityFlavor" type="checkbox" value="">Biscuity</label></div>
-                                                <div class="checkbox"><label><input id="beerBourbonFlavor" type="checkbox" value="">Bourbon</label></div>
-                                                <div class="checkbox"><label><input id="beerBreadFlavor" type="checkbox" value="">Bread</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerButterFlavor" type="checkbox" value="">Butter</label></div>
-                                                <div class="checkbox"><label><input id="beerCaramelFlavor" type="checkbox" value="">Caramel</label></div>
-                                                <div class="checkbox"><label><input id="beerCitrusFlavor" type="checkbox" value="">Citrus</label></div>
-                                                <div class="checkbox"><label><input id="beerChocolateFlavor" type="checkbox" value="">Chocolate</label></div>
-                                                <div class="checkbox"><label><input id="beerCoffeeFlavor" type="checkbox" value="">Coffee</label></div>
-                                                <div class="checkbox"><label><input id="beerDriedFruitFlavor" type="checkbox" value="">Dried Fruit</label></div>
-                                                <div class="checkbox"><label><input id="beerFloralFlavor" type="checkbox" value="">Floral</label></div>
-                                                <div class="checkbox"><label><input id="beerFruitFlavor" type="checkbox" value="">Fruit</label></div>
-                                                <div class="checkbox"><label><input id="beerGrapefruitFlavor" type="checkbox" value="">Grapefruit</label></div>
-                                                <div class="checkbox"><label><input id="beerGrassFlavor" type="checkbox" value="">Grass</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerHoneyFlavor" type="checkbox" value="">Honey</label></div>
-                                                <div class="checkbox"><label><input id="beerHopsFlavor" type="checkbox" value="">Hops</label></div>
-                                                <div class="checkbox"><label><input id="beerLicoriceFlavor" type="checkbox" value="">Licorice</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerMaltFlavor" type="checkbox" value="">Malt</label></div>
-                                                <div class="checkbox"><label><input id="beerOrangeFlavor" type="checkbox" value="">Orange</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerPineFlavor" type="checkbox" value="">Pine</label></div>
-                                                <div class="checkbox"><label><input id="beerPumpkinFlavor" type="checkbox" value="">Pumpkin</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerRaisinFlavor" type="checkbox" value="">Raisin</label></div>
-                                                <div class="checkbox"><label><input id="beerSausageFlavor" type="checkbox" value="">Sausage</label></div>
-                                                <div class="checkbox"><label><input id="beerSmokeFlavor" type="checkbox" value="">Smoke</label></div>
-                                                <div class="checkbox"><label><input id="beerTangerineFlavor" type="checkbox" value="">Tangerine</label></div>
-                                                <div class="checkbox"><label><input id="beerVanillaFlavor" type="checkbox" value="">Vanilla</label></div>                                            
-                                                <div class="checkbox"><label><input id="beerWheatFlavor" type="checkbox" value="">Wheat</label></div>
-                                                <div class="checkbox"><label><input id="beerWoodFlavor" type="checkbox" value="">Wood</label></div>
-                                                <div class="checkbox"><label><input id="beerYeastFlavor" type="checkbox" value="">Yeast</label></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                                        
-                                <hr />
-                            
-                                <div class="form-group">
-                                    <label for="beerDescription">Description</label>
-                                    <textarea id="beerDescription" class="form-control"></textarea>
-                                </div>                                                      
-                            </form>
-                        </div>
-      
-                        <div class="modal-footer">
-                            <div class="pull-left text-muted">
-                                <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new beer."></span>
-                                <span>Generated Beer ID:</span>
-                                <span id="beerId"></span>
-                            </div>                        
-                        
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button id="saveBeerButton" type="button" class="btn btn-primary">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
+                
             <!-- Beer Result Dialog -->
             <div id="beerResultModal" class="modal fade" tabindex="-1" role="dialog">
                 <div class="modal-dialog">
@@ -386,80 +270,6 @@
                             </div>                        
                         
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                       
-            <!-- Brewery Dialog -->
-            <div id="breweryModal" class="modal fade" tabindex="-1" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Brewery</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form>
-                                <div id="breweryErrorAlert" class="alert alert-danger collapse" role="alert">
-                                    <span><i class="fa fa-times-circle"></i>&nbsp;Error:</span>
-                                    <span>There was a problem. Please check the console window for more details.</span>
-                                </div>
-                            
-                                <div class="form-group">
-                                    <label for="breweryName">Name</label>
-                                    <input type="text" class="form-control" id="breweryName" placeholder="">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="brewerySlogan">Slogan</label>
-                                    <input type="text" class="form-control" id="brewerySlogan" placeholder="something witty goes here">
-                                </div>
-                            
-                                <div class="form-group">
-                                    <label for="breweryDescription">Description</label>
-                                    <textarea id="breweryDescription" class="form-control" rows="3"></textarea>
-                                </div>
-                            
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="breweryType">Type of Brewery</label>
-                                            <select id="breweryType" class="form-control">
-                                                <option value="nano">Nano</option>
-                                                <option value="micro">Micro</option>
-                                                <option value="farm">Farm</option>
-                                                <option value="regional">Regional</option>
-                                                <option value="macro">Macro</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="breweryLatitude">Latitude</label>
-                                            <input type="text" class="form-control" id="breweryLatitude">
-                                        </div>
-                                    </div>
-                            
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="breweryLongitude">Longitude</label>
-                                            <input type="text" class="form-control" id="breweryLongitude">
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-      
-                        <div class="modal-footer">
-                            <div class="pull-left text-muted">
-                                <span class="fa fa-question-circle text-muted help" data-toggle="tooltip" data-placement="top" title="" data-original-title="This is the ID that will be assigned to the new brewery."></span>                            
-                                <span>Generated Brewery ID:</span>
-                                <span id="breweryId"></span>
-                            </div>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button id="saveBreweryButton" type="button" class="btn btn-primary">Save</button>
                         </div>
                     </div>
                 </div>
@@ -578,6 +388,8 @@
                     currentPage:1, 
                     pageSize:7,
                     pageCount: 0,
+
+                    shoppingCart: [],
 
                     // These are the details used interact with the Azure Search Service behind this app.
                     searchService: {

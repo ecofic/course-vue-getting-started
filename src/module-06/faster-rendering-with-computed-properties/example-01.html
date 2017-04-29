@@ -5,45 +5,49 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-
-        <style type="text/css">
-            .footer {
-                border-top-width:2px;
-            }
-        </style>
     </head>
 
     <body>
         <div class="container">
             <br />
             <div id="growler">            
-                <p>An example of a watched property.</p>
+                <p>An example of a computed property.</p>
 
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Beer</th>
+                            <th>Item</th>
                             <th>Price</th>
-                            <th></th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr v-for="beer in beers">
-                            <td>{{ beer.name }}</td>
-                            <td>{{ beer.price }}</td>
-                            <td><button class="btn btn-warning" v-on:click="buy(beer)">buy</button></td>
+                        <tr v-for="item in items">
+                            <td>{{ item.name }}</td>
+                            <td>${{ item.price }}</td>
                         </tr>
                     </tbody>
 
                     <tfoot>
                         <tr>
-                            <td class="footer">Subtotal</td>
-                            <td class="footer">{{ subTotal }}</td>
-                            <td class="footer"></td>
+                            <td>Subtotal</td>
+                            <td>${{ subTotal }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Sales Tax</td>
+                            <td>{{ salesTax }}</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>Grand Total</td>
+                            <td>${{ grandTotal }}</td>
                         </tr>
                     </tfoot>
                 </table>
+
+                <button class="btn btn-primary" v-on:click="generatePrices">Generate Random Prices</button>
+                <button class="btn btn-seconary" v-on:click="generateNewTaxRate">Generate Random Tax Rate</button>
             </div>
         </div>
 
@@ -73,48 +77,43 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    beers: [
-                        { name: 'Ahool Ale', price: 2.80 },
-                        { name: 'Agogwe Ale', price: 2.38 },
-                        { name: 'Aswang Ale', price: 3.05 },
-                        { name: "Buru's Barley Wine", price: 2.95 },
-                        { name: 'Hyote Chocolate Stout', price: 4.68 },
-                        { name: 'Igopogo Pilsner', price: 3.40 },
-                        { name: 'Jackalobe Lager', price: 2.49 },
-                        { name: 'Mahamba Barley Wine', price: 4.89 },
-                        { name: 'Megalodon Pale Ale', price: 3.76 },
-                        { name: 'Pope Lick Porter', price: 3.52 },
-                        { name: 'Chocolate Pukwudgie Stout', price: 4.17 },
-                        { name: 'Sharlie Pilsner', price: 2.92 },
-                        { name: 'Sigbin Stout', price: 2.49 },
-                        { name: 'Snallygaster Pale Ale', price: 3.64 },
-                        { name: 'Tikibalang Barley Wine', price: 4.21 },
-                        { name: 'Pale Popobawa Ale', price: 4.34 },
-                        { name: 'North Adjule Lager', price: 3.84 }
+                    items: [
+                        { name: 'Milk', price: 3.52 },
+                        { name: 'Eggs', price: 1.86 }                        
                     ],
-
-                    shoppingCart: [],
-                    subTotal: 0.00
+                    subTotal: 0.00,                    
+                    salesTax: 0.07
                 },
                 watch: {
-                    shoppingCart: function() {
-                        this.updateSubTotal();
-                    }
-                },
-                created: function() {
-                    this.updateSubTotal();
-                },
-                methods: {
-                    updateSubTotal: function() {
+                    items: function() {
+                        console.log('responding to item change.');
                         var t = 0;
-                        for (var i=0; i<this.shoppingCart.length; i++) {
-                            t += this.shoppingCart[i].price;
+                        for (var i=0; i<this.items.length; i++) {
+                            t = t + this.items[i].price;
                         }
                         this.subTotal = t;
+                    }
+                },
+                computed: {
+                    grandTotal: function() {
+                        return this.subTotal * this.salesTax;
+                    }
+                },
+                methods: {
+                    generatePrices: function() {
+                        for (var i=0; i<this.items.length; i++) {
+                            var dollars = Math.floor((Math.random() * 3) + 1);                  // Get a random value between 1 and 3
+                            var cents = Math.floor((Math.random() * 99)) / 100;                 // Get a random value between 0 and 99
+
+                            var item = this.items[i];
+                            item.price = (dollars + cents).toFixed(2);
+                            Vue.set(this.items, i, item);                                       // Overcome limitations of JavaScript. Ensure Vue is aware of the change in data
+                        }
                     },
 
-                    buy: function(beer) {
-                        this.shoppingCart.push(beer);
+                    generateNewTaxRate: function() {
+                        var newTaxRate = Math.floor((Math.random() * 10)) / 100;                 // Get a random value between 0 and 10                        
+                        this.salesTax = newTaxRate;
                     }
                 }
             });        

@@ -11,8 +11,10 @@
         <div class="container">
             <br />
             <div id="growler">            
-                <p>An example of a computed property.</p>
-                <div>Online? {{ isOnline }}</div>
+                <p>An example of the data change lifecycle. Make sure to look in the console window to fully see the results.</p>
+                Pick a Number: <input v-model="num" />
+
+                <div>{{ getIndex | formatted }} value: {{ num }}</div>
             </div>
         </div>
 
@@ -42,24 +44,57 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    canConnect: false
+                    num: 1
+                },
+                watch: {
+                    num: function() {
+                        console.log('watcher');
+                    }                    
                 },
                 computed: {
-                    isOnline: function() {
-                        return this.canConnect ? 'Yes' : 'No';
+                    getIndex: function() {
+                        console.log('computed property');
+                        return this.num - 1;
                     }
                 },
+                filters: {
+                    formatted: function(val) {
+                        console.log('filter');
+                        return 'index: ' + val;
+                    }
+                },
+                beforeCreate: function() {
+                    console.log('beforeCreate');
+                },
+
                 created: function() {
-                    axios.get('https://www.ecofic.com')
-                        .then(function (res) {
-                            growler.canConnect = true;
-                        })
-                        .catch(function (err) {
-                            growler.canConnect = false;
-                        })
-                    ;
-                }
-            });
+                    console.log('created');                    
+                },
+
+                beforeMount: function() {
+                    console.log('beforeMount');                    
+                },
+
+                mounted: function() {
+                    console.log('mounted');                    
+                },
+
+                beforeUpdate: function() {
+                    console.log('beforeUpdate');
+                },
+
+                updated: function() {
+                    console.log('updated');
+                },
+
+                beforeDestroy: function() {
+                    console.log('beforeDestroy');
+                },
+
+                destroyed: function() {
+                    console.log('afterDestroy');
+                }                
+            });        
         </script>
     </body>
 </html>

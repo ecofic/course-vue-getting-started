@@ -5,45 +5,49 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-
-        <style type="text/css">
-            .footer {
-                border-top-width:2px;
-            }
-        </style>
     </head>
 
     <body>
         <div class="container">
             <br />
             <div id="growler">            
-                <p>An example of a watched property.</p>
+                <p>An example of a computed property.</p>
 
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Beer</th>
                             <th>Price</th>
-                            <th></th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr v-for="beer in beers">
+                        <tr v-for="beer in selectedBeers">
                             <td>{{ beer.name }}</td>
-                            <td>{{ beer.price }}</td>
-                            <td><button class="btn btn-warning" v-on:click="buy(beer)">buy</button></td>
+                            <td>{{ beer.price | toDollar }}</td>
                         </tr>
                     </tbody>
 
                     <tfoot>
                         <tr>
-                            <td class="footer">Subtotal</td>
-                            <td class="footer">{{ subTotal }}</td>
-                            <td class="footer"></td>
+                            <td style="border-top-width:2px;">Subtotal</td>
+                            <td style="border-top-width:2px;">{{ subTotal | toDollar }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Sales Tax ({{ salesTaxRate }})</td>
+                            <td>{{ salesTax | toDollar }}</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="border-top-width:2px;">Grand Total</td>
+                            <td style="border-top-width:2px;">{{ grandTotal | toDollar }}</td>
                         </tr>
                     </tfoot>
                 </table>
+
+                <button class="btn btn-primary" v-on:click="generatePrices">Generate Random Beer Prices</button>
+                <button class="btn btn-seconary" v-on:click="generateNewTaxRate">Generate Random Tax Rate</button>
             </div>
         </div>
 
@@ -73,32 +77,32 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    beers: [
-                        { name: 'Ahool Ale', price: 2.80 },
-                        { name: 'Agogwe Ale', price: 2.38 },
-                        { name: 'Aswang Ale', price: 3.05 },
-                        { name: "Buru's Barley Wine", price: 2.95 },
-                        { name: 'Hyote Chocolate Stout', price: 4.68 },
-                        { name: 'Igopogo Pilsner', price: 3.40 },
-                        { name: 'Jackalobe Lager', price: 2.49 },
-                        { name: 'Mahamba Barley Wine', price: 4.89 },
-                        { name: 'Megalodon Pale Ale', price: 3.76 },
+                    selectedBeers: [
+                        { name: 'Ahool Ale', price: 2.49 },
                         { name: 'Pope Lick Porter', price: 3.52 },
-                        { name: 'Chocolate Pukwudgie Stout', price: 4.17 },
-                        { name: 'Sharlie Pilsner', price: 2.92 },
-                        { name: 'Sigbin Stout', price: 2.49 },
-                        { name: 'Snallygaster Pale Ale', price: 3.64 },
-                        { name: 'Tikibalang Barley Wine', price: 4.21 },
-                        { name: 'Pale Popobawa Ale', price: 4.34 },
-                        { name: 'North Adjule Lager', price: 3.84 }
+                        { name: 'Chocolate Pukwudgie Stout', price: 4.17 }
                     ],
-
-                    shoppingCart: [],
-                    subTotal: 0.00
+                    subTotal: 0.00,                    
+                    salesTaxRate: 0.07
                 },
                 watch: {
-                    shoppingCart: function() {
+                    selectedBeers: function() {
                         this.updateSubTotal();
+                    }
+                },
+                computed: {
+                    salesTax: function() {
+                        return this.subTotal * this.salesTaxRate;
+                    },
+
+                    grandTotal: function() {
+                        var tax = this.subTotal * this.salesTaxRate;
+                        return (tax + this.subTotal);
+                    }
+                },
+                filters: {
+                    toDollar: function(v) {
+                        return '$' + v.toFixed(2);
                     }
                 },
                 created: function() {
@@ -107,14 +111,26 @@
                 methods: {
                     updateSubTotal: function() {
                         var t = 0;
-                        for (var i=0; i<this.shoppingCart.length; i++) {
-                            t += this.shoppingCart[i].price;
+                        for (var i=0; i<this.selectedBeers.length; i++) {
+                            t += this.selectedBeers[i].price;
                         }
                         this.subTotal = t;
                     },
 
-                    buy: function(beer) {
-                        this.shoppingCart.push(beer);
+                    generatePrices: function() {
+                        for (var i=0; i<this.selectedBeers.length; i++) {
+                            var dollars = Math.floor((Math.random() * 4) + 1);                          // Get a random value between 1 and 4
+                            var cents = Math.floor((Math.random() * 99)) / 100;                         // Get a random value between 0 and 99
+
+                            var beer = this.selectedBeers[i];
+                            beer.price = Math.round((dollars + cents) * 100) / 100;
+                            Vue.set(this.selectedBeers, i, beer);                                       // Overcome limitations of JavaScript. Ensure Vue is aware of the change in data
+                        }
+                    },
+
+                    generateNewTaxRate: function() {
+                        var newTaxRate = Math.floor((Math.random() * 10) + 1) / 100;                    // Get a random value between 1 and 10                        
+                        this.salesTaxRate = newTaxRate;
                     }
                 }
             });        
