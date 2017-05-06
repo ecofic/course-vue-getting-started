@@ -20,7 +20,7 @@
   },
   "scripts": {
     "windows": "cd ./src/ & lite-server",
-    "linux":   "cd ./src/ ; lite-server"
+    "linux": "cd ./src/ ; lite-server"
   },
   "dependencies": {},
   "devDependencies": {
