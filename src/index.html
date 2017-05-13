@@ -120,6 +120,14 @@
 
                             <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
                                 <div class="card-block">
+                                    <h4>Using Input Bindings</h4>
+                                    <h5>Binding to Text Fields</h5>
+                                    <ul>
+                                        <li><a href="/module-03/using-input-bindings/binding-to-text-fields/example-01.html">Binding to a "text" <code>input</code> field.</a></li>
+                                        <li><a href="/module-03/using-input-bindings/binding-to-text-fields/example-02.html">Binding to a <code>textarea</code> field.</a></li>                                        
+                                    </ul>
+
+
                                     <strong>Using Input Bindings</strong>
                                     <ul>
                                         <li><a href="/module-03/using-input-bindings/textual-input-types.html">Textual Input Types</a></li>                                
@@ -155,13 +163,34 @@
                             <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
                                 <div class="card-block">
                                     <h4>Using Event Handlers</h4>
+                                    <h5>Attaching to Events</h5>
                                     <ul>
+                                        <li><a href="/module-04/using-event-handlers/attaching-to-events/example-01.html">Attaching to an Event</a></li>
+                                    </ul>
+
+                                    <h5>Defining an Event Handler</h5>
+                                    <ul>
+                                        <li><a href="/module-04/using-event-handlers/defining-an-event-handler/example-01.html">Defining an Event Handler</a></li>
+                                    </ul>
+
+                                    <h5>Examining the Event</h5>
+                                    <ul>
+                                        <li><a href="/module-04/using-event-handlers/examining-the-event/example-01.html">Examining the Event</a></li>
+                                    </ul>                                    
+
+                                    <h5>Passing Parameters with Inline Statements</h5>
+                                    <ul>
+                                        <li><a href="/module-04/using-event-handlers/passing-parameters-with-inline-statements/example-01.html">Passing a string with an inline statement</a></li>
+                                        <li><a href="/module-04/using-event-handlers/passing-parameters-with-inline-statements/example-02.html">Passing a <code>Number</code> with an inline statement</a></li>
+                                        <li><a href="/module-04/using-event-handlers/passing-parameters-with-inline-statements/example-03.html">Passing a <code>Date</code> with an inline statement</a></li>
+                                        <li><a href="/module-04/using-event-handlers/passing-parameters-with-inline-statements/example-04.html">Passing an <code>Object</code> with an inline statement</a></li>                                        
+                                    </ul>
+
+                                    <!--
                                         <li><a href="/module-04/using-event-handlers/handling-events-with-methods.html">Handling Events</a></li>                                
                                         <li><a href="/module-04/using-event-handlers/handling-events-inline.html">Handling Events Inline</a></li>
-                                        <li><a href="/module-04/using-event-handlers/passing-parameters-to-methods.html">Handling Events Inline</a></li>
                                         <li><a href="/module-04/using-event-handlers/shorthand-syntax.html">Shorthand Syntax</a></li>
-                                    </ul>
-                                    <br />
+                                    -->
 
                                     <h4>Altering Events</h4>
                                     <h5>Understanding Event Propagation</h5>
@@ -255,6 +284,14 @@
                                         <li><a href="/module-05/rendering-lists-of-items/iterating-through-arrays/example-03.html">getting the index of an array object</a></li>
                                         <li><a href="/module-05/rendering-lists-of-items/iterating-through-arrays/example-04.html">iterating through an array of arrays</a></li>
                                     </ul>
+
+                                    <h4>Detecting Array Changes</h4>
+                                    <h5>Changing an Array</h5>
+                                    <ul>
+                                        <li><a href="/module-05/detecting-array-changes/changing-an-array/sort-function/example-01.html">Sorting an array of strings</li>
+                                        <li><a href="/module-05/detecting-array-changes/changing-an-array/sort-function/example-02.html">Sorting an array of numbers</li>
+                                    </ul>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -384,7 +421,7 @@
                     var exampleCount = (this.examples.length >= 5) ? 5 : this.examples.length;
                     for (var i=0; i<exampleCount; i++) {
                         var randomIndex = Math.floor(Math.random() * exampleCount);
-                        if (picked.indexOf(randomItem) == -1) {
+                        if (picked.indexOf(this.examplesToDisplay[randomIndex]) == -1) {
                             this.examplesToDisplay.push(this.example[randomIndex]);
                             picked.push(randomIndex);
                         } else {
