@@ -11,6 +11,7 @@
             .event-block {
                 border-width: 1px;
                 border-style: solid;
+                border-color: green;
                 padding:3rem;
             }
         </style>
@@ -23,37 +24,38 @@
             <div id="growler">                
                 <form style="width:100%;">
                     <p>
-                        This example shows how to use mouse modifiers on events.
+                        This example shows how to use the <code>right</code> mouse modifier.
                     </p>
 
                     <div class="form-group row">
-                        <div class="col-12">
-                            <div class="event-block text-center" style="border-color:green;" v-on:click="onAnyClick">
-                                Click in this area with any mouse button.
-                            </div>
-                        </div>                        
-                    </div>
-                    <br />                    
-
-                    <div class="form-group row">
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.left="leftBlockClick">
-                                Click in this area with the left mouse button.
-                            </div>
-                        </div>
-                        
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.middle="middleBlockClick">
-                                Click in this area with the middle mouse button.
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:contextmenu.prevent="rightBlockClick">
+                        <div class="col-3">
+                            <strong>without <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:mousedown="onBlockClick">
                                 Click in this area with the right mouse button.
                             </div>
                         </div>                        
-                    </div>                        
+                        
+                        <div class="col-3">
+                            <strong>with <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:mousedown.right="onBlockClick">
+                                Click in this area with the right mouse button.
+                            </div>
+                        </div>                        
+
+                        <div class="col-3">
+                            <strong>with <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:click.right.prevent="onBlockClick">
+                                Click in this area with the right mouse button.
+                            </div>
+                        </div>                        
+
+                        <div class="col-3">
+                            <strong>with <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:contextmenu.prevent="onBlockClick">
+                                Click in this area with the right mouse button.
+                            </div>
+                        </div>                        
+                    </div>
 
                     <br />
                     <div class="form-group">
@@ -99,27 +101,9 @@
                 },
 
                 methods: {
-                    onAnyClick: function(e) {
-                        if (e instanceof MouseEvent) {
-                            this.logMouseEvent(e);
-                        } else {
-                            this.history += 'The click event did not come from the mouse.';
-                        }
-                    },
+                    onBlockClick: function(e) {
+                        this.history += 'Mouse was pressed down!\n';
 
-                    leftBlockClick: function(e) {
-                        this.logMouseEvent(e);
-                    },
-
-                    middleBlockClick: function(e) {
-                        this.logMouseEvent(e);
-                    },
-
-                    rightBlockClick: function(e) {
-                        this.logMouseEvent(e);
-                    },
-
-                    logMouseEvent: function(e) {
                         var button = 'Unknown';
                         if (e.button === 0) {
                             button = 'Left';
@@ -127,10 +111,8 @@
                             button = 'Middle';
                         } else if (e.button === 2) {
                             button = 'Right';
-                        }
-
-                        console.log(e);
-                        this.history += 'Mouse click happened: ' + button + ' button clicked.\n';
+                        }                        
+                        this.history += button + ' button was pressed down.\n---\n\n';
                     },
 
                     clearHistory: function() {

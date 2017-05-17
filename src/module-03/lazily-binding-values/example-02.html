@@ -12,12 +12,12 @@
         <div class="container">
             <br />
             <p>
-                This example shows the default binding behavior.<br />
-                The default binding behavior uses the <code>input</code> event.
+                This example shows the lazy binding behavior.<br />
+                This binding behavior uses the <code>change</code> event.
             </p>
 
             <div id="growler">
-                <input v-model="query" placeholder="Search...">
+                <input v-model.lazy="query" placeholder="Search...">
                 <br />
   
                 <div>Searching for: {{ query }}</div>

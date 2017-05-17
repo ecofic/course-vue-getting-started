@@ -22,38 +22,50 @@
 
             <div id="growler">                
                 <form style="width:100%;">
-                    <p>
-                        This example shows how to use mouse modifiers on events.
-                    </p>
+                    <div class="form-group row">
+                        <div class="col-8">
+                            This example shows how to use the <code>left</code>, <code>middle</code>, and <code>right</code> mouse modifiers on events.
+                            The purpose of this example is to show which modifiers work with each mouse event. 
+                            It's important to examine this example's code with the behavior.
+                        </div>
+                    </div>
+                    <br />
 
                     <div class="form-group row">
-                        <div class="col-12">
-                            <div class="event-block text-center" style="border-color:green;" v-on:click="onAnyClick">
-                                Click in this area with any mouse button.
-                            </div>
-                        </div>                        
+                        <div class="col-4">Left modifier</div>
+                        <div class="col-4">Middle modifier</div>
+                        <div class="col-4">Right modifier</div>                        
                     </div>
-                    <br />                    
 
                     <div class="form-group row">
                         <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.left="leftBlockClick">
+                            <div class="event-block text-center" style="border-color:green;" 
+                                v-on:click.left="onClick" v-on:contextmenu.left="onContextMenu" v-on:ondblclick.left="onDoubleClick"
+                                v-on:mousedown.left="onMouseDown" v-on:mouseup.left="onMouseUp" v-on:onmouseover.left="onMouseOver" 
+                                v-on:onmouseenter.left="onMouseEnter" v-on:onmouseleave.left="onMouseLeave" v-on:onmousemove.left="onMouseMove" v-on:onmouseout.left="onMouseOut">
                                 Click in this area with the left mouse button.
                             </div>
                         </div>
-                        
+
                         <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:click.middle="middleBlockClick">
+                            <div class="event-block text-center" style="border-color:green;" 
+                                v-on:click.middle="onClick" v-on:contextmenu.middle="onContextMenu" v-on:ondblclick.middle="onDoubleClick"
+                                v-on:mousedown.middle="onMouseDown" v-on:mouseup.middle="onMouseUp" v-on:onmouseover.middle="onMouseOver" 
+                                v-on:onmouseenter.middle="onMouseEnter" v-on:onmouseleave.middle="onMouseLeave" v-on:onmousemove.middle="onMouseMove" v-on:onmouseout.middle="onMouseOut">
                                 Click in this area with the middle mouse button.
                             </div>
                         </div>
 
                         <div class="col-4">
-                            <div class="event-block text-center" style="border-color: green;" v-on:contextmenu.prevent="rightBlockClick">
+                            <div class="event-block text-center" style="border-color:green;" 
+                                v-on:click.right="onClick" v-on:contextmenu.right="onContextMenu" v-on:ondblclick.right="onDoubleClick"
+                                v-on:mousedown.right="onMouseDown" v-on:mouseup.right="onMouseUp" v-on:onmouseover.right="onMouseOver" 
+                                v-on:onmouseenter.right="onMouseEnter" v-on:onmouseleave.right="onMouseLeave" v-on:onmousemove.right="onMouseMove" v-on:onmouseout.right="onMouseOut">
                                 Click in this area with the right mouse button.
                             </div>
-                        </div>                        
-                    </div>                        
+                        </div>
+                    </div>
+                    <br />                    
 
                     <br />
                     <div class="form-group">
@@ -99,27 +111,53 @@
                 },
 
                 methods: {
-                    onAnyClick: function(e) {
+                    onClick: function(e) {
                         if (e instanceof MouseEvent) {
-                            this.logMouseEvent(e);
+                            this.logMouseEvent(e, 'click');
+                            this.history += '---\n\n';
                         } else {
                             this.history += 'The click event did not come from the mouse.';
                         }
                     },
 
-                    leftBlockClick: function(e) {
-                        this.logMouseEvent(e);
+                    onContextMenu: function(e) {
+                        this.logMouseEvent(e, 'contextmenu');
+                        this.history += '---\n\n';                        
                     },
 
-                    middleBlockClick: function(e) {
-                        this.logMouseEvent(e);
+                    onDoubleClick: function(e) {
+                        this.logMouseEvent(e, 'double click');
+                    },
+                    
+                    onMouseDown: function(e) {
+                        this.logMouseEvent(e, 'down');
                     },
 
-                    rightBlockClick: function(e) {
-                        this.logMouseEvent(e);
+                    onMouseUp: function(e) {
+                        this.logMouseEvent(e, 'up');
                     },
 
-                    logMouseEvent: function(e) {
+                    onMouseEnter: function(e) {
+                        this.logMouseEvent(e, 'mouse enter');
+                    },
+
+                    onMouseLeave: function(e) {
+                        this.logMouseEvent(e, 'mouse leave');
+                    },
+
+                    onMouseMove: function(e) {
+                        this.logMouseEvent(e, 'mouse move');
+                    },
+
+                    onMouseOver: function(e) {
+                        this.logMouseEvent(e, 'mouse over');
+                    },
+
+                    onMouseOut: function(e) {
+                        this.logMouseEvent(e, 'mouse out');
+                    },
+
+                    logMouseEvent: function(e, eventName) {
                         var button = 'Unknown';
                         if (e.button === 0) {
                             button = 'Left';
@@ -130,7 +168,7 @@
                         }
 
                         console.log(e);
-                        this.history += 'Mouse click happened: ' + button + ' button clicked.\n';
+                        this.history += 'Mouse ' + eventName + ' happened: ' + button + ' button clicked.\n';
                     },
 
                     clearHistory: function() {
