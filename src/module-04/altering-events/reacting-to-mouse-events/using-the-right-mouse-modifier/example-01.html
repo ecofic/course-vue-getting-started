@@ -28,33 +28,19 @@
                     </p>
 
                     <div class="form-group row">
-                        <div class="col-3">
-                            <strong>without <code>right</code> modifier</strong><br />
+                        <div class="col-6">
+                            <strong><code>onmousedown</code> without <code>right</code> modifier</strong><br />
                             <div class="event-block text-center" v-on:mousedown="onBlockClick">
                                 Click in this area with the right mouse button.
                             </div>
                         </div>                        
                         
-                        <div class="col-3">
-                            <strong>with <code>right</code> modifier</strong><br />
+                        <div class="col-6">
+                            <strong><code>onmousedown</code> with <code>right</code> modifier</strong><br />
                             <div class="event-block text-center" v-on:mousedown.right="onBlockClick">
                                 Click in this area with the right mouse button.
                             </div>
-                        </div>                        
-
-                        <div class="col-3">
-                            <strong>with <code>right</code> modifier</strong><br />
-                            <div class="event-block text-center" v-on:click.right.prevent="onBlockClick">
-                                Click in this area with the right mouse button.
-                            </div>
-                        </div>                        
-
-                        <div class="col-3">
-                            <strong>with <code>right</code> modifier</strong><br />
-                            <div class="event-block text-center" v-on:contextmenu.prevent="onBlockClick">
-                                Click in this area with the right mouse button.
-                            </div>
-                        </div>                        
+                        </div>
                     </div>
 
                     <br />

@@ -24,29 +24,27 @@
             <div id="growler">                
                 <form style="width:100%;">
                     <p>
-                        This example shows how to use the <code>middle</code> mouse modifier.
+                        This example shows how to use the <code>right</code> mouse modifier.
                     </p>
 
                     <div class="form-group row">
-                        <div class="col-4">
-                            <strong><code>onmousedown</code> event without <code>middle</code> modifier</strong><br />
-                            <div class="event-block text-center" v-on:mousedown="onBlockClick">
-                                Click in this area with the middle mouse button.
-                            </div>
-                        </div>                        
-                        
-                        <div class="col-4">
-                            <strong><code>onmousedown</code> event with <code>middle</code> modifier</strong><br />
-                            <div class="event-block text-center" v-on:mousedown.middle="onBlockClick">
-                                Click in this area with the middle mouse button.
+                        <div class="col-6">
+                            <strong><code>onclick</code> event with <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:click.right="onBlockClick">
+                                Click in this area with the right mouse button.
                             </div>
                         </div>                        
 
-                        <div class="col-4">
-                            <strong><code>click</code> event with <code>middle</code> modifier</strong><br />
-                            <div class="event-block text-center" v-on:click.middle="onBlockClick">
-                                Click in this area with the middle mouse button.
+                        <div class="col-6">
+                            <strong><code>oncontextmenu</code> with <code>right</code> modifier</strong><br />
+                            <div class="event-block text-center" v-on:contextmenu.prevent="onBlockClick">
+                                Click in this area with the right mouse button.
                             </div>
+
+                            <ul id="myContextMenu" class="list-unstyled" tabindex="-1" v-if="showContextMenu" v-on:blur="closeContextMenu" v-bind:style="{ top:top, left:left }" style="position:fixed; background-color:lightgray; padding:1rem;">
+                                <li><a href="#" v-on:click="onCopyClick">Copy</a></li>
+                                <li><a href="#" v-on:click="onPasteClick">Paste</a></li>
+                            </ul>
                         </div>                        
                     </div>
 
@@ -90,7 +88,11 @@
                 el: '#growler',
                 data: {
                     query: '',
-                    history: ''
+                    history: '',
+
+                    showContextMenu: false,
+                    top: '0px',
+                    left: '0px'
                 },
 
                 methods: {
@@ -104,12 +106,32 @@
                             button = 'Middle';
                         } else if (e.button === 2) {
                             button = 'Right';
-                        }                        
+
+                            this.showContextMenu = true;
+                            this.top = e.y + 'px';
+                            this.left = e.x + 'px';
+
+                            console.log(e);
+                        }          
                         this.history += button + ' button was pressed down.\n---\n\n';
                     },
 
                     clearHistory: function() {
                         this.history = '';
+                    },
+
+                    closeContextMenu: function() {
+                        this.showContextMenu = false;                        
+                    },
+
+                    onCopyClick: function() {
+                        alert('copy something');
+                        this.closeContextMenu();
+                    },
+
+                    onPasteClick: function() {
+                        alert('paste something');
+                        this.closeContextMenu();                        
                     }
                 }
             });        
