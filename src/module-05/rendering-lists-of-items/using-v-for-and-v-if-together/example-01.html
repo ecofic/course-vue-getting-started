@@ -5,25 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="/public/css/app.css">
     </head>
 
     <body>
         <div class="container">
             <br />
-            <div id="growler" v-on:keydown.f1="openInfo">
-                <form class="form-horizontal">
-                    <p>
-                        This example demonstrates using custom modifiers. With the <code>textarea</code> focused, press the "F1" key.
-                    </p>
 
-                    <br />
+            <p>This example shows how to use <code>sort</code> function on an array of strings.</p>
+
+            <div id="growler">
+                <form style="width:100%;">
                     <div class="form-group">
-                        <label for="logTextarea">Event Log (<a href="#" v-on:click="clearHistory">clear</a>)</label>
-                        <textarea class="form-control" v-model="history" rows="15"></textarea>
-                    </div>                    
+                        <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration.">Max Alcohol by Volume (a.b.v.)</label>
+                        <p style="margin-bottom:0;"><input class="form-control" min="0" max="100" v-model="maxAbv" type="range" /></p>
+                        <small class="text-muted">{{ maxAbv }}%</small>
+                    </div>
+                    
+                    <ul class="list-unstyled">
+                        <li><strong>Beers</strong></li>
+                        <li v-for="beer in beers">{{ beer }}</li>
+                    </ul>
                 </form>
             </div>
         </div>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">These examples complement the <a href="https://www.ecofic.com/courses/vue-getting-started" target="_blank">Vue.js: Getting Started</a> training course.</span>
+            </div>
+        </footer>
 
         <!-- 
             Google Analytics is included to identify if individuals find the sample useful.
@@ -44,29 +55,19 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
-        <script src="https://unpkg.com/vue@2.1.10/dist/vue.js" type="text/javascript"></script>
+        <script src="https://unpkg.com/vue@2.2.5/dist/vue.js" type="text/javascript"></script>
         <script type="text/javascript">
-
-            Vue.config.keyCodes = {
-                f1: 112
-            };
-
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    query: '',
-                    history: ''
-                },
-
-                methods: {
-                    openInfo: function(e) {
-                        e.preventDefault();
-                        this.history += 'Show app information.\n';
-                    },
-
-                    clearHistory: function() {
-                        this.history = '';
-                    }
+                    beers: [
+                        { name: 'Tikibalang Barley Wine', abv:9.6 },
+                        { name: 'Hyote Chocolate Stout', abv:7.4 },
+                        { name: 'Pope Lick Porter', abv:6.5 },
+                        { name: 'Ahool Ale', abv:5.4 },
+                        { name: 'North Adjule Lager', abv:3.7 }                                                
+                    ],
+                    maxAbv:5.0
                 }
             });        
         </script>
