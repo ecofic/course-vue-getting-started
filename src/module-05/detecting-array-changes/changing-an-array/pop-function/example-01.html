@@ -12,40 +12,22 @@
         <div class="container">
             <br />
 
-            <p>This example shows how to use <code>sort</code> function on an array of numbers.</p>
+            <p>This example shows how to use the <code>pop</code> function with an array.</p>
 
             <div id="growler">
                 <form style="width:100%;">
-                    <div class="row">
-                        <div class="col-2">
-                            <ul class="list-unstyled">
-                                <li><strong>Alcohol by Volumes (ABV)</strong></li>
-                                <li v-for="beer in abv">{{ beer }}</li>
-                            </ul>
-                        </div>
+                    <ul class="list-unstyled">
+                        <li><strong>Beers: {{ count }}</strong></li>
+                        <li v-for="beer in beers">{{ beer }}</li>
+                    </ul>
 
-                        <div class="col-1">
-                            <button type="button" class="btn btn-secondary" v-on:click="sortClick">Sort</button>
-                        </div>
+                    <br />
 
-                        <div class="col-2">
-                            <ul class="list-unstyled" v-if="sortedAbv.length > 0">
-                                <li><strong>Default Sort</strong></li>
-                                <li v-for="beer in sortedAbv">{{ beer }}</li>
-                            </ul>                            
-                        </div>
-
-                        <div class="col-1">
-                            <button type="button" class="btn btn-secondary" v-on:click="numericallySortClick" v-if="sortedAbv.length > 0">Sort</button>                            
-                        </div>
-
-                        <div class="col-2">
-                            <ul class="list-unstyled" v-if="numericallySortedAbv.length > 0">
-                                <li><strong>Numeric Sort</strong></li>
-                                <li v-for="beer in numericallySortedAbv">{{ beer }}</li>
-                            </ul>                                                        
-                        </div>
-                    </div>
+                    <input type="text" class="form-control" v-model="newBeerName" />                    
+                    <ul class="list-inline">
+                        <li><button type="button" class="btn btn-primary" v-on:click="pushClick">Push onto Array</button></li>
+                        <li><button type="button" class="btn btn-secondary" v-on:click="popClick">Pop Last Item</button></li>
+                    </li>
                 </form>
             </div>
         </div>
@@ -80,29 +62,21 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    abv: [
-                        9.7,
-                        12.2,
-                        5.7,
-                        11.1,
-                        2.9
+                    beers: [
+                        'Ahool Ale',
+                        'Hyote Chocolate Stout',
+                        'Tikibalang Barley Wine'
                     ],
-
-                    sortedAbv: [],
-
-                    numericallySortedAbv: []
+                    newBeerName: '',
+                    count: 3                                // This property exists to test the fact that the push function returns the new length
                 },
                 methods: {
-                    sortClick: function() {
-                        this.sortedAbv = this.abv.slice();
-                        this.sortedAbv.sort();                        
+                    pushClick: function() {
+                        this.count = this.beers.push(this.newBeerName);
+                        this.newBeerName = '';
                     },
-
-                    numericallySortClick: function() {
-                        this.numericallySortedBeers = this.abv.slice();
-                        this.numericallySortedAbv.sort(function(v1, v2) {
-                            return v1 - v2;
-                        });
+                    popClick: function() {
+                        this.beers.pop();
                     }
                 }                
             });        
