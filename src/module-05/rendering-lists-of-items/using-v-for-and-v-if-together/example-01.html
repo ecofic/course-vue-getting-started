@@ -12,19 +12,18 @@
         <div class="container">
             <br />
 
-            <p>This example shows how to use <code>sort</code> function on an array of strings.</p>
-
+            <p>This example shows how to use <code>v-for</code> and <code>v-if</code> together.</p>
             <div id="growler">
                 <form style="width:100%;">
                     <div class="form-group">
-                        <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration.">Max Alcohol by Volume (a.b.v.)</label>
+                        <label data-toggle="tooltip" data-placement="left" title="This demonstrates a query duration."><strong>Max Alcohol by Volume (a.b.v.)</strong></label>
                         <p style="margin-bottom:0;"><input class="form-control" min="0" max="100" v-model="maxAbv" type="range" /></p>
                         <small class="text-muted">{{ maxAbv }}%</small>
                     </div>
                     
                     <ul class="list-unstyled">
                         <li><strong>Beers</strong></li>
-                        <li v-for="beer in beers">{{ beer }}</li>
+                        <li v-for="beer in beers" v-if="beer.abv < maxAbv">{{ beer }}</li>
                     </ul>
                 </form>
             </div>
@@ -67,7 +66,7 @@
                         { name: 'Ahool Ale', abv:5.4 },
                         { name: 'North Adjule Lager', abv:3.7 }                                                
                     ],
-                    maxAbv:5.0
+                    maxAbv:7.0
                 }
             });        
         </script>

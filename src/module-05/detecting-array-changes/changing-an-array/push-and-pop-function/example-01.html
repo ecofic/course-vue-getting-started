@@ -12,7 +12,7 @@
         <div class="container">
             <br />
 
-            <p>This example shows how to use the <code>pop</code> function with an array.</p>
+            <p>This example shows how to use the <code>push</code> function with an array.</p>
 
             <div id="growler">
                 <form style="width:100%;">
@@ -22,12 +22,8 @@
                     </ul>
 
                     <br />
-
-                    <input type="text" class="form-control" v-model="newBeerName" />                    
-                    <ul class="list-inline">
-                        <li><button type="button" class="btn btn-primary" v-on:click="pushClick">Push onto Array</button></li>
-                        <li><button type="button" class="btn btn-secondary" v-on:click="popClick">Pop Last Item</button></li>
-                    </li>
+                    <input type="text" class="form-control" v-model="newBeerName" placeholder="Enter a new beer name" />
+                    <button type="button" class="btn btn-primary" v-on:click="pushClick">Push</button>
                 </form>
             </div>
         </div>
@@ -74,9 +70,6 @@
                     pushClick: function() {
                         this.count = this.beers.push(this.newBeerName);
                         this.newBeerName = '';
-                    },
-                    popClick: function() {
-                        this.beers.pop();
                     }
                 }                
             });        

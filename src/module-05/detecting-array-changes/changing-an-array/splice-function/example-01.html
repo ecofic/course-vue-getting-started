@@ -12,27 +12,20 @@
         <div class="container">
             <br />
 
+            <p>This example shows how to use the <code>shift</code> function with an array.</p>
+
             <div id="growler">
                 <form style="width:100%;">
-                    <p>
-                        This example shows how to use the <code>v-if</code>, <code>v-else-if</code>, and <code>v-else</code> directives.
-                        Press the search button to generate a random number of search results.
-                    </p>
+                    <ul class="list-unstyled">
+                        <li><strong>Beers: {{ this.beers.length }}</strong></li>
+                        <li v-for="beer in beers">{{ beer }}</li>
+                    </ul>
 
-                    <div class="form-group">
-                        <div class="input-group">
-                            <button v-on:click="executeSearch" type="button" class="btn btn-primary">Search</button>                            
-                        </div>
-                    </div>
+                    <br />
 
-                    <div class="form-group">
-                        <label>Query Results</label>
-                        <p v-cloak>
-                            <div v-if="beers.length === 0">No beers were returned</div>
-                            <div v-else-if="beers.length === 1">1 beer was returned</div>
-                            <div v-else>{{ beers.length }} beers were returned</div>
-                        </p>
-                    </div>
+                    <ul class="list-inline" style="margin-top:0.4rem;">
+                        <li class="list-inline-item"><button type="button" class="btn btn-primary" v-on:click="spliceClick">Splice</button></li>
+                    </li>
                 </form>
             </div>
         </div>
@@ -67,22 +60,19 @@
             var growler = new Vue({
                 el: '#growler',
                 data: {
-                    beers: []
+                    beers: [
+                        'Pope Lick Porter',
+                        'Hyote Chocolate Stout',
+                        'Ahool Ale',
+                        'Tikibalang Barley Wine'
+                    ],
+                    newBeerName: ''
                 },
                 methods: {
-                    executeSearch: function() {
-                        var randomCount = Math.floor(Math.random() * 4);
-
-                        this.beers = [];
-                        for (var i=0; i<randomCount; i++) {
-                            var beer = {
-                                id: (i+1),
-                                name: 'Beer #' + (i+1)
-                            };
-                            this.beers.push(beer);
-                        }
+                    spliceClick: function() {
+                        this.beers.splice(1, 2);
                     }
-                }
+                }                
             });        
         </script>
     </body>

@@ -12,7 +12,7 @@
         <div class="container">
             <br />
 
-            <p>This example shows how to use the <code>push</code> function with an array.</p>
+            <p>This example shows how to use the <code>unshift</code> function with an array.</p>
 
             <div id="growler">
                 <form style="width:100%;">
@@ -22,8 +22,11 @@
                     </ul>
 
                     <br />
-                    <input type="text" class="form-control" v-model="newBeerName" />
-                    <button type="button" class="btn btn-primary" v-on:click="pushClick">Push</button>
+
+                    <input type="text" class="form-control" v-model="newBeerName" placeholder="Enter a new beer name" />                    
+                    <ul class="list-inline" style="margin-top:0.4rem;">
+                        <li class="list-inline-item"><button type="button" class="btn btn-primary" v-on:click="unshiftClick">Unshift onto Array</button></li>
+                    </li>
                 </form>
             </div>
         </div>
@@ -64,11 +67,11 @@
                         'Tikibalang Barley Wine'
                     ],
                     newBeerName: '',
-                    count: 3                                // This property exists to test the fact that the push function returns the new length
+                    count: 4                                // This property exists to test the fact that the push function returns the new length
                 },
                 methods: {
-                    pushClick: function() {
-                        this.count = this.beers.push(this.newBeerName);
+                    unshiftClick: function() {
+                        this.count = this.beers.unshift(this.newBeerName);
                         this.newBeerName = '';
                     }
                 }                
