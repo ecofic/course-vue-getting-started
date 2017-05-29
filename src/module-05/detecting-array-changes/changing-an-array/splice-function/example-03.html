@@ -13,8 +13,8 @@
             <br />
 
             <p>
-                This example shows how to use the <code>splice</code> function with an <code>Array</code>.
-                In this example, a specific number of items are removed from the <code>Array</code>.
+                This example shows how to use the <code>splice</code> function with an array.
+                In this example, the optional count parameter is not included.
             </p>
 
             <div id="growler">
@@ -27,7 +27,8 @@
                     <br />
 
                     <ul class="list-inline" style="margin-top:0.4rem;">
-                        <li class="list-inline-item"><button type="button" class="btn btn-primary" v-on:click="spliceClick">Splice</button></li>
+                        <li class="list-inline-item"><button type="button" class="btn btn-primary" v-on:click="removeClick">Remove with Splice</button></li>
+                        <li class="list-inline-item"><button type="button" class="btn btn-secondary" v-on:click="replaceClick">Replace with Splice</button></li>                        
                     </li>
                 </form>
             </div>
@@ -69,12 +70,21 @@
                         'Ahool Ale',
                         'Tikibalang Barley Wine'
                     ],
-                    newBeerName: ''
+                    removed: []
                 },
                 methods: {
-                    spliceClick: function() {
-                        var removed = this.beers.splice(1, 2);
-                        console.log(removed);
+                    removeClick: function() {
+                        this.removed = this.beers.splice(1, 2);
+                    },
+
+                    replaceClick: function() {
+                        try {                            
+                            for (var i=0; i<this.removed.length; i++) {
+                                this.beers.splice(1, 0, this.removed[i]);
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                        }
                     }
                 }                
             });        

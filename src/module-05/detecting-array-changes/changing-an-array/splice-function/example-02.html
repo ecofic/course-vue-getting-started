@@ -13,8 +13,8 @@
             <br />
 
             <p>
-                This example shows how to use the <code>splice</code> function with an <code>Array</code>.
-                In this example, a specific number of items are removed from the <code>Array</code>.
+                This example shows how to use the <code>splice</code> function with an array.
+                In this example, the optional count parameter is not included.
             </p>
 
             <div id="growler">
@@ -73,7 +73,7 @@
                 },
                 methods: {
                     spliceClick: function() {
-                        var removed = this.beers.splice(1, 2);
+                        var removed = this.beers.splice(1);
                         console.log(removed);
                     }
                 }                
