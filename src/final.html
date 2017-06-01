@@ -66,7 +66,7 @@
                         <form class="form-horizontal">
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input v-model.trim="query" v-on:keypress.enter.prevent="executeNewSearch" v-on:keyup.ctrl.enter="executeSearchInNewWindow" type="search" class="form-control" placeholder="please enter your query here." autofocus />
+                                    <input id="queryField" v-model.trim="query" v-on:keypress.enter.prevent="executeNewSearch" v-on:keyup.ctrl.enter="executeSearchInNewWindow" type="search" class="form-control" placeholder="please enter your query here." autofocus />
                                     <div class="input-group-btn" data-toggle="tooltip" data-placement="right" title="This field toggles between which search index the query will be executed against.">
                                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="searchIndexButton">Beers</span> <span class="caret"></span></button>
                                         <ul class="dropdown-menu dropdown-menu-right">
@@ -122,7 +122,7 @@
                                                 <ul class='list-inline text-muted'>
                                                     <li>ibu: {{ beer.ibu }}</li>
                                                     <li>abv: {{ beer.abv }}</li>
-                                                    <li>last tapped: [lastTappedOn]</li>
+                                                    <li>last tapped: {{ beer.lastTappedOn | formatDate }}</li>
                                                     <li>score: {{ beer['@search.score'] }}</li>
                                                 </ul>                                                
                                             </div>
@@ -395,7 +395,7 @@
                 data: {
                     appName: 'Growler',
                     appLogo: '/public/img/logo.png',
-                    isOnline: true, 
+                    isOnline: false, 
                     
                     query: '',
                     maxAbv: 5,
@@ -457,6 +457,18 @@
                             distance = distanceInMi.toFixed(1) + ' mi. or ' + distanceInKm.toFixed(1) + ' km.';               
                         }
                         return distance;                        
+                    },
+
+                    /**
+                     * Formats the date value.
+                     **/
+                    formatDate: function(d) {
+                        var formatted = 'unknown';
+                        if (d) {
+                            formatted = d.substring(0, d.length-1);  // remove the last 'Z' for the purpose of conversion.
+                            formatted = moment(formatted, 'YYYY-MM-DDTHH:mm:ss').format('MM/DD/YYYY');
+                        }
+                        return formatted;      
                     }
                 },
                 computed: {
@@ -502,7 +514,26 @@
                         );
                     } else {
 //                        toggleWarning('Your browser does not have support for geolocation.', true);                    
-                    }                    
+                    }
+
+                    // Detect whether we can hit the internet or not. We'll rely on the search service for this.
+                    var searchUrl = this.searchService.url + '/' + this.searchIndex + '/docs/suggest?' + this.searchService.apiParam;
+                    var searchParameters = {
+                        search: 'a',
+                        suggesterName:'beerSuggestions',
+                        top: 1
+                    };
+                    var searchConfig = { headers: this.searchService.headers };
+                    
+                    axios.post(searchUrl, searchParameters, { headers: this.searchService.headers })
+                        .then(function (response) {
+                            self.isOnline = true;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            self.isOnline = false;
+                        })
+                    ;                    
                 },
 
                 methods: {
@@ -554,8 +585,8 @@
                                 growler.results = response.data;                                
                                 growler.resultCount = response.data['@odata.count'];
 
+                                console.log(growler.results);
                                 var temp = (growler.resultCount + growler.pageSize - 1) / growler.pageSize;
-                                console.log('resultCount: ' + growler.resultCount + ' pageSize: ' + growler.pageSize + ' temp: ' + temp);
                                 growler.pageCount = Math.floor(temp);
                             })
                             .catch(function (error) {
@@ -601,7 +632,9 @@
                         $('#infoModal').modal('show');
                     }
                 }
-            });            
+            });  
+
+            $('#queryField').focus();          
         </script>
     </body>
 </html>
