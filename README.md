@@ -12,6 +12,7 @@ To run this project, open a command prompt.
 Once you've oriented to $SAMPLE_PATH (i.e. C:\Learning\Vue\course-vue-getting-started), run the following:
 
 ```
+npm install
 cd src
 lite-server
 ```
