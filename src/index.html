@@ -441,7 +441,7 @@
                         </p>
 
                         <ul class="list-unstyled">
-                            <li v-for="example in examples">
+                            <li v-for="example in examplesToDisplay">
                                 <div>
                                     <a v-bind:href="example.url" target="_blank">{{ example.name }}</a><br />                                    
                                     <small class="text-muted">By <a v-bind:href="example.author.url" target="_blank" style="color:#636c72;">{{ example.author.name }}</a></small>
@@ -498,12 +498,22 @@
                     // Pick at most, 5 random examples
                     var exampleCount = (this.examples.length >= 5) ? 5 : this.examples.length;
                     for (var i=0; i<exampleCount; i++) {
+                        var breaker = 0;
+                        
                         var randomIndex = Math.floor(Math.random() * exampleCount);
-                        if (picked.indexOf(this.examplesToDisplay[randomIndex]) == -1) {
-                            this.examplesToDisplay.push(this.example[randomIndex]);
+                        if (picked.length > 0) {
+                            while ($.inArray(randomIndex, picked) !== -1) {
+                                randomIndex = Math.floor(Math.random() * exampleCount);
+                                breaker = breaker + 1;
+                                if (breaker > 1000) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (breaker < 1000) {
+                            this.examplesToDisplay.push(this.examples[randomIndex]);
                             picked.push(randomIndex);
-                        } else {
-                            i = i - 1;
                         }
                     }
                 }
