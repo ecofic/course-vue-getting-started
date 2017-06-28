@@ -9,7 +9,7 @@
     "vue",
     "ecofic"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {},
   "author": {
     "name": "Chad Campbell"
